@@ -163,6 +163,10 @@ class FollyConan(ConanFile):
         # Honor Boost_ROOT set by boost recipe
         tc.cache_variables["CMAKE_POLICY_DEFAULT_CMP0074"] = "NEW"
 
+        tc.generate()
+
+        deps = CMakeDeps(self)
+        deps.generate()
 
         # 2019.10.21.00 -> either MSVC_ flags or CXX_STD
         if is_msvc(self):
