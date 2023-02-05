@@ -128,6 +128,9 @@ class FollyConan(ConanFile):
             required_components = ", ".join(self._required_boost_components)
             raise ConanInvalidConfiguration(f"{self.ref} requires these Boost components: {required_components}. Try with '-o boost/*:without_{required_components}=False'")
 
+    def _preserve_tarball_root(self):
+        return Version(self.version) >= "2022.01.31.00"
+
     def source(self):
         get(self, **self.conan_data["sources"][self.version], strip_root=False)
 
