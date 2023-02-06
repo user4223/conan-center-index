@@ -47,6 +47,19 @@ class FollyConan(ConanFile):
             "Visual Studio": "16",
         }
 
+    def _cppstd_less_than(self, cppstd, min_cppstd):
+        def less_than(lhs, rhs):
+            def extract_cpp_version(_cppstd):
+                return str(_cppstd).replace("gnu", "")
+
+            def add_millennium(_cppstd):
+                return "19%s" % _cppstd if _cppstd == "98" else "20%s" % _cppstd
+
+            lhs = add_millennium(extract_cpp_version(lhs))
+            rhs = add_millennium(extract_cpp_version(rhs))
+            return lhs < rhs
+        return less_than(cppstd, min_cppstd)
+        
     def export_sources(self):
         copy(self, "conan_deps.cmake", self.recipe_folder, os.path.join(self.export_sources_folder, "src"))
 
