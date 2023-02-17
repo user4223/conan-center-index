@@ -55,6 +55,26 @@ class ProtobufConan(ConanFile):
         current_ver = Version(self.version)
         return Version(f"{current_ver.minor}.{current_ver.patch}")
 
+    @property
+    def _can_disable_rtti(self):
+        return Version(self.version) >= "3.15.4"
+
+    @property
+    def _min_cppstd(self):
+        return 11 if Version(self.version) < "4.22.0" else 14
+
+    @property
+    def _compilers_minimum_version(self):
+        return {
+            "14": {
+                "gcc": "8",
+                "clang": "5",
+                "apple-clang": "10",
+                "Visual Studio": "15",
+                "msvc": "191",
+            },
+        }.get(self._min_cppstd, {})
+
     def export_sources(self):
         export_conandata_patches(self)
         copy(self, "protobuf-conan-protoc-target.cmake", self.recipe_folder, os.path.join(self.export_sources_folder, "src"))
@@ -76,6 +96,8 @@ class ProtobufConan(ConanFile):
     def requirements(self):
         if self.options.with_zlib:
             self.requires("zlib/[>=1.2.11 <2]")
+        if Version(self.version) >= "4.22.0":
+            self.requires("abseil/20230125.3", transitive_headers=True)
 
         if self._protobuf_release >= "22.0":
             self.requires("abseil/20240116.2", transitive_headers=True)
@@ -91,6 +113,14 @@ class ProtobufConan(ConanFile):
         }
 
     def validate(self):
+        if self.settings.compiler.cppstd:
+            check_min_cppstd(self, self._min_cppstd)
+        minimum_version = self._compilers_minimum_version.get(str(self.settings.compiler), False)
+        if minimum_version and Version(self.settings.compiler.version) < minimum_version:
+            raise ConanInvalidConfiguration(
+                f"{self.ref} requires C++{self._min_cppstd}, which your compiler does not support."
+            )
+
         if self.options.shared and is_msvc_static_runtime(self):
             raise ConanInvalidConfiguration("Protobuf can't be built with shared + MT(d) runtimes")
         
@@ -216,6 +246,9 @@ class ProtobufConan(ConanFile):
             rm(self, "libprotobuf-lite*", os.path.join(self.package_folder, "lib"))
             rm(self, "libprotobuf-lite*", os.path.join(self.package_folder, "bin"))
 
+        if Version(self.version) >= "4.22.0":
+            rmdir(self, os.path.join(self.package_folder, "lib", "cmake", "utf8_range"))
+
     def package_info(self):
         self.cpp_info.set_property("cmake_find_mode", "both")
         self.cpp_info.set_property("cmake_module_file_name", "Protobuf")
@@ -228,6 +261,8 @@ class ProtobufConan(ConanFile):
             os.path.join(self._cmake_install_base_path, "protobuf-options.cmake"),
             os.path.join(self._cmake_install_base_path, "protobuf-conan-protoc-target.cmake"),
         ]
+        if Version(self.version) >= "4.22.0":
+            build_modules.append(os.path.join(self._cmake_install_base_path, "protobuf-protoc.cmake"))
         self.cpp_info.set_property("cmake_build_modules", build_modules)
 
         lib_prefix = "lib" if (is_msvc(self) or self._is_clang_cl) else ""
