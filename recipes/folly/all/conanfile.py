@@ -112,6 +112,9 @@ class FollyConan(ConanFile):
         if minimum_version and Version(self.settings.compiler.version) < minimum_version:
             raise ConanInvalidConfiguration(f"{self.ref} requires C++{self._min_cppstd}, which your compiler does not support.")
 
+        if self.settings.os == "Macos" and self.settings.arch != "x86_64":
+            raise ConanInvalidConfiguration("Conan currently requires a 64bit target architecture for Folly on Macos")
+
         if self.settings.os == "Windows" and self.settings.arch != "x86_64":
             raise ConanInvalidConfiguration(f"{self.ref} Folly requires a 64bit target architecture on Windows.")
 
