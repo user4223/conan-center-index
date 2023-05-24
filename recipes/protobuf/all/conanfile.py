@@ -86,6 +86,9 @@ class ProtobufConan(ConanFile):
     def configure(self):
         if self.options.shared:
             self.options.rm_safe("fPIC")
+            # shared build protobuf requires Abseil as shared libraries to avoid ODR violations.
+            if Version(self.version) >= "4.22.0":
+                self.options["abseil"].shared = True
 
         if self._protobuf_release < "27.0":
             self.options.rm_safe("upb")
