@@ -67,7 +67,7 @@ class ProtobufConan(ConanFile):
     def _compilers_minimum_version(self):
         return {
             "14": {
-                "gcc": "8",
+                "gcc": "7.3",
                 "clang": "5",
                 "apple-clang": "10",
                 "Visual Studio": "15",
@@ -118,10 +118,16 @@ class ProtobufConan(ConanFile):
     def validate(self):
         if self.settings.compiler.cppstd:
             check_min_cppstd(self, self._min_cppstd)
+        def loose_lt_semver(v1, v2):
+            lv1 = [int(v) for v in v1.split(".")]
+            lv2 = [int(v) for v in v2.split(".")]
+            min_length = min(len(lv1), len(lv2))
+            return lv1[:min_length] < lv2[:min_length]
+
         minimum_version = self._compilers_minimum_version.get(str(self.settings.compiler), False)
-        if minimum_version and Version(self.settings.compiler.version) < minimum_version:
+        if minimum_version and loose_lt_semver(str(self.settings.compiler.version), minimum_version):
             raise ConanInvalidConfiguration(
-                f"{self.ref} requires C++{self._min_cppstd}, which your compiler does not support."
+                f"{self.ref} requires C++{self._min_cppstd}, which your compiler does not support.",
             )
 
         if self.options.shared and is_msvc_static_runtime(self):
@@ -259,13 +265,10 @@ class ProtobufConan(ConanFile):
         self.cpp_info.set_property("pkg_config_name", "protobuf_full_package") # unofficial, but required to avoid side effects (libprotobuf component "steals" the default global pkg_config name)
 
         build_modules = [
-            os.path.join(self._cmake_install_base_path, "protobuf-generate.cmake"),
             os.path.join(self._cmake_install_base_path, "protobuf-module.cmake"),
             os.path.join(self._cmake_install_base_path, "protobuf-options.cmake"),
             os.path.join(self._cmake_install_base_path, "protobuf-conan-protoc-target.cmake"),
         ]
-        if Version(self.version) >= "4.22.0":
-            build_modules.append(os.path.join(self._cmake_install_base_path, "protobuf-protoc.cmake"))
         self.cpp_info.set_property("cmake_build_modules", build_modules)
 
         lib_prefix = "lib" if (is_msvc(self) or self._is_clang_cl) else ""
