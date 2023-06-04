@@ -131,20 +131,8 @@ class FollyConan(ConanFile):
             required_components = ", ".join(self._required_boost_components)
             raise ConanInvalidConfiguration(f"{self.ref} requires these Boost components: {required_components}. Try with '-o boost/*:without_{required_components}=False'")
 
-    def _cmake_new_enough(self, required_version):
-        try:
-            import re
-            from io import StringIO
-            output = StringIO()
-            self.run("cmake --version", output=output)
-            m = re.search(r'cmake version (\d+\.\d+\.\d+)', output.getvalue())
-            return Version(m.group(1)) >= required_version
-        except:
-            return False
-
     def build_requirements(self):
-        if not self._cmake_new_enough("3.13"):  # Make sure CMP0077 is honored
-            self.tool_requires("cmake/3.25.3")
+        pass
 
     def _preserve_tarball_root(self):
         return Version(self.version) >= "2022.01.31.00"
