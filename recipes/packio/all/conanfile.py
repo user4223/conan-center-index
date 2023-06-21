@@ -84,7 +84,7 @@ class PackioConan(ConanFile):
             self.requires("boost/1.75.0")
 
         if self.options.get_safe("standalone_asio"):
-            self.requires("asio/1.27.0")
+            self.requires("asio/1.28.0")
 
     def validate(self):
         if self.settings.compiler.get_safe("cppstd"):
