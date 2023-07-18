@@ -59,12 +59,12 @@ class ImageMagicConan(ConanFile):
         "with_bzlib": True,
         "with_lzma": True,
         "with_lcms": True,
-        "with_openexr": True,
-        "with_heic": True,
+        "with_openexr": False, # FIXME
+        "with_heic": False, # FIXME
         "with_jbig": True,
         "with_jpeg": "libjpeg",
-        "with_openjp2": True,
-        "with_pango": True,
+        "with_openjp2": False,  # FIXME
+        "with_pango": False,  # FIXME
         "with_png": True,
         "with_tiff": True,
         "with_webp": True,
@@ -329,6 +329,7 @@ class ImageMagicConan(ConanFile):
             env = VirtualRunEnv(self)
             env.generate(scope="build")
 
+    def _generate_autotools(self):
         def yes_no(o):
             return "yes" if o else "no"
 
