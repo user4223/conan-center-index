@@ -23,11 +23,13 @@ class SystemcComponentsConan(ConanFile):
     package_type = "static-library"
     settings = "os", "arch", "compiler", "build_type"
     options = {
+        "shared": [True, False],
         "fPIC": [True, False],
         "enable_phase_callbacks": [True, False],
         "enable_phase_callbacks_tracing": [True, False],
     }
     default_options = {
+        "shared": False,
         "fPIC": True,
         "enable_phase_callbacks": False,
         "enable_phase_callbacks_tracing": False,
