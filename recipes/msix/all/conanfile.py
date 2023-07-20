@@ -67,6 +67,16 @@ class MsixConan(ConanFile):
             # with_xerces is required
             del self.options.with_xerces
 
+        if self.options.xml_parser == "auto":
+            if self.settings.os == "Android":
+                self.options.xml_parser = "javaxml"
+            elif is_apple_os(self):
+                self.options.xml_parser = "applexml"
+            elif self.settings.os == "Windows":
+                self.options.xml_parser = "msxml6"
+            else:
+                self.options.xml_parser = "xerces"
+
     def configure(self):
         if self.options.shared:
             self.options.rm_safe("fPIC")
