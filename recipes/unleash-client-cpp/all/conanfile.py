@@ -29,10 +29,10 @@ class UnleashConan(ConanFile):
 
     @property
     def _min_cppstd(self):
-        return "17"
+        return 17
 
     @property
-    def _compilers_min_version(self):
+    def _compilers_minimum_version(self):
         return {
             "Visual Studio": "15",  # Should we check toolset?
             "msvc": "191",
