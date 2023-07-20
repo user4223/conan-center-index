@@ -43,6 +43,8 @@ class GetDnsConan(ConanFile):
     def config_options(self):
         if self.settings.os == "Windows":
             del self.options.fPIC
+        self.options.stub_only = self._stub_only
+        self.options.with_libev = self._with_libev
 
     def configure(self):
         if self.options.shared:
