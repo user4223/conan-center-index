@@ -57,6 +57,9 @@ class OpenMPIConan(ConanFile):
     def layout(self):
         basic_layout(self, src_folder="src")
 
+    def layout(self):
+        basic_layout(self, src_folder="src")
+
     def requirements(self):
         # OpenMPI public headers don't include anything besides stddef.h.
         # transitive_headers=True is not needed for any dependencies.
