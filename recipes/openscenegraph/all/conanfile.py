@@ -173,6 +173,18 @@ class OpenSceneGraphConanFile(ConanFile):
                 "Contributions are welcome."
             )
 
+    def validate(self):
+        if self.options.get_safe("with_asio", False):
+            raise ConanInvalidConfiguration(
+                "ASIO support in OSG is broken, "
+                "see https://github.com/openscenegraph/OpenSceneGraph/issues/921"
+            )
+        if hasattr(self, "settings_build") and cross_building(self):
+            raise ConanInvalidConfiguration(
+                "openscenegraph recipe cannot be cross-built yet. "
+                "Contributions are welcome."
+            )
+
     def source(self):
         get(self, **self.conan_data["sources"][self.version], strip_root=True)
 
