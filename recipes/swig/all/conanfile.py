@@ -174,7 +174,7 @@ class SwigConan(ConanFile):
 
     @property
     def _module_subfolder(self):
-        return os.path.join(self.package_folder, "lib", "cmake")
+        return os.path.join("lib", "cmake")
 
     @property
     def _cmake_module_rel_path(self):

@@ -46,6 +46,17 @@ class TestPackageConan(ConanFile):
         deps = CMakeDeps(self)
         deps.generate()
 
+    @property
+    def _python_interpreter(self):
+        if getattr(sys, "frozen", False):
+            return "python"
+        return sys.executable
+
+    def generate(self):
+        tc = CMakeToolchain(self)
+        tc.variables["Python_EXECUTABLE"] = PurePath(self._python_interpreter).as_posix()
+        tc.generate()
+
     def build(self):
         if can_run(self):
             self.run("swig -swiglib")
