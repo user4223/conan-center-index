@@ -25,6 +25,12 @@ class TestPackageConan(ConanFile):
             return "python"
         return sys.executable
 
+    @property
+    def _python_interpreter(self):
+        if getattr(sys, "frozen", False):
+            return "python"
+        return sys.executable
+
     def build(self):
         if not tools.cross_building(self, skip_x64_x86=True):
             self.run("swig -swiglib", run_environment=True)
@@ -40,6 +46,15 @@ class TestPackageConan(ConanFile):
         sys.path.append(self.build_folder)
         # Could also simply use 'import PackageTest' but this makes pylint angry
         PackageTest = importlib.import_module("PackageTest")
+        assert PackageTest.gcd(12, 16) == 4
+        self.output.info("PackageTest.gcd(12, 16) ran successfully")
+        assert PackageTest.cvar.foo == 3.14159265359
+        self.output.info("PackageTest.cvar.foo == 3.14159265359 ran successfully")
+        sys.path.pop()
+
+    def _test_swig_module(self):
+        sys.path.append(self.build_folder)
+        import PackageTest
         assert PackageTest.gcd(12, 16) == 4
         self.output.info("PackageTest.gcd(12, 16) ran successfully")
         assert PackageTest.cvar.foo == 3.14159265359
