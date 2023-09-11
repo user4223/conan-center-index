@@ -78,6 +78,10 @@ class GobjectIntrospectionConan(ConanFile):
         if self.options.build_introspection_data and cross_building(self):
             raise ConanInvalidConfiguration(f"{self.ref} build_introspection_data is not supported when cross-building. Use '&:build_introspection_data=False'.")
 
+    def validate(self):
+        if self.dependencies["glib"].options.shared:
+            raise ConanInvalidConfiguration("gobject-introspection can't be built with shared glib")
+
     def build_requirements(self):
         self.tool_requires("meson/[>=1.2.3 <2]")
         if not self.conf.get("tools.gnu:pkg_config", default=False, check_type=str):
