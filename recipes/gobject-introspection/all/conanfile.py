@@ -82,6 +82,10 @@ class GobjectIntrospectionConan(ConanFile):
         if self.dependencies["glib"].options.shared:
             raise ConanInvalidConfiguration("gobject-introspection can't be built with shared glib")
 
+    def validate(self):
+        if self.dependencies["glib"].options.shared:
+            raise ConanInvalidConfiguration("gobject-introspection can't be built with shared glib")
+
     def build_requirements(self):
         self.tool_requires("meson/[>=1.2.3 <2]")
         if not self.conf.get("tools.gnu:pkg_config", default=False, check_type=str):
