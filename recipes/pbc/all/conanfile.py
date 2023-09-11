@@ -33,6 +33,10 @@ class PbcConan(ConanFile):
         "fPIC": True,
     }
 
+    @property
+    def _settings_build(self):
+        return getattr(self, "settings_build", self.settings)
+
     def export_sources(self):
         export_conandata_patches(self)
 
