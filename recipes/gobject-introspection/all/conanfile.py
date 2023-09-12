@@ -1,7 +1,6 @@
 import os
 
 from conan import ConanFile
-from conan.errors import ConanInvalidConfiguration
 from conan.tools.build import cross_building
 from conan.tools.env import VirtualBuildEnv, VirtualRunEnv
 from conan.tools.files import copy, get, replace_in_file, rm, rmdir
@@ -147,6 +146,7 @@ class GobjectIntrospectionConan(ConanFile):
 
     def build(self):
         self._patch_sources()
+        os.environ["PKG_CONFIG_PATH"] = os.path.join(self.build_folder, "conan")
         meson = Meson(self)
         meson.configure()
         meson.build()
