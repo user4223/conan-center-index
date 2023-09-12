@@ -57,8 +57,6 @@ class TestPackageConan(ConanFile):
         tc.variables["Python_EXECUTABLE"] = PurePath(self._python_interpreter).as_posix()
         tc.generate()
         deps = CMakeDeps(self)
-        deps.build_context_activated = ["swig"]
-        deps.build_context_build_modules = ["swig"]
         deps.generate()
 
     def build(self):
