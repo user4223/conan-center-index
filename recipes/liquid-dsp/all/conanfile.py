@@ -118,6 +118,14 @@ class LiquidDspConan(ConanFile):
             autotools.make(self._target_name)
         self._rename_libraries()
 
+    @property
+    def _lib_pattern(self):
+        if is_apple_os(self) and not self.options.shared:
+            return "libliquid.a"
+        if self.settings.os != "Windows":
+            return self._target_name
+        return "libliquid.lib"
+
     def package(self):
         copy(self, "LICENSE",
              dst=os.path.join(self.package_folder, "licenses"),
@@ -128,6 +136,12 @@ class LiquidDspConan(ConanFile):
         copy(self, self._lib_pattern,
              dst=os.path.join(self.package_folder, "lib"),
              src=self.source_folder)
+
+    @property
+    def _libname(self):
+        if self.settings.os == "Windows":
+            return "libliquid"
+        return "liquid"
 
     def package_info(self):
         self.cpp_info.libs = ["liquid"]
