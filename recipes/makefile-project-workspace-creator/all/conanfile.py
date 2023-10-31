@@ -1,6 +1,6 @@
 import os
 
-from conan import ConanFile
+from conan import ConanFile, conan_version
 from conan.tools.files import copy, get
 from conan.tools.layout import basic_layout
 
