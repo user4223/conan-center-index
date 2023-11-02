@@ -77,6 +77,9 @@ class ApriltagConan(ConanFile):
                         "ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}",
                         "ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}\n"
                         "RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}")
+        # Skip the building and installation of examples
+        replace_in_file(self, os.path.join(self.source_folder, "CMakeLists.txt"),
+                        "# Examples", "return()")
 
     def build(self):
         self._patch_sources()
