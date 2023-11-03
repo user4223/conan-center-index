@@ -1,4 +1,4 @@
-from conan import ConanFile
+from conan import ConanFile, conan_version
 from conan.tools.layout import basic_layout
 from conan.tools.files import save, load
 import os
