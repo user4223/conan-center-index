@@ -134,9 +134,6 @@ class FollyConan(ConanFile):
     def build_requirements(self):
         pass
 
-    def _preserve_tarball_root(self):
-        return Version(self.version) >= "2022.01.31.00"
-
     def source(self):
         get(self, **self.conan_data["sources"][self.version], strip_root=False)
 
