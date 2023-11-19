@@ -81,6 +81,9 @@ class TileDBConan(ConanFile):
             "Visual Studio": "16",
         }
 
+    def export_sources(self):
+        export_conandata_patches(self)
+
     def config_options(self):
         if self.settings.os == "Windows":
             del self.options.fPIC
@@ -227,6 +230,7 @@ class TileDBConan(ConanFile):
         deps.generate()
 
     def _patch_sources(self):
+        apply_conandata_patches(self)
         # Disable examples
         replace_in_file(self, os.path.join(self.source_folder, "CMakeLists.txt"),
                         "add_subdirectory(examples)", "")
