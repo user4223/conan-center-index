@@ -59,12 +59,12 @@ class ImageMagicConan(ConanFile):
         "with_bzlib": True,
         "with_lzma": True,
         "with_lcms": True,
-        "with_openexr": False, # FIXME
-        "with_heic": False, # FIXME
+        "with_openexr": True,
+        "with_heic": True,
         "with_jbig": True,
         "with_jpeg": "libjpeg",
-        "with_openjp2": False,  # FIXME
-        "with_pango": False,  # FIXME
+        "with_openjp2": True,
+        "with_pango": False,  # FIXME: re-enable once migrated
         "with_png": True,
         "with_tiff": True,
         "with_webp": True,
