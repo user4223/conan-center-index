@@ -130,9 +130,6 @@ class GetDnsConan(ConanFile):
         deps.set_property("nettle", "cmake_target_name", "Nettle::Nettle")
         deps.generate()
 
-        deps = PkgConfigDeps(self)
-        deps.generate()
-
     def _patch_sources(self):
         apply_conandata_patches(self)
         rm(self, "Find*.cmake", os.path.join(self.source_folder, "cmake", "modules"))
