@@ -43,8 +43,9 @@ class GetDnsConan(ConanFile):
     def config_options(self):
         if self.settings.os == "Windows":
             del self.options.fPIC
-        self.options.stub_only = self._stub_only
-        self.options.with_libev = self._with_libev
+        self.options.stub_only = self.settings.os != "Windows"
+        # FIXME: uncomment the next line when libunbound is available
+        self.options.with_libev = True  # self.settings.os == "Windows"
 
     def configure(self):
         if self.options.shared:
@@ -112,6 +113,24 @@ class GetDnsConan(ConanFile):
         deps.set_property("libidn2", "cmake_target_name", "Libidn2::Libidn2")
         deps.set_property("libuv", "cmake_file_name", "Libuv")
         deps.set_property("libuv", "cmake_target_name", "Libuv::Libuv")
+        deps.generate()
+
+        deps = CMakeDeps(self)
+        deps.set_property("gnutls", "cmake_file_name", "GnuTLS")
+        deps.set_property("gnutls", "cmake_target_name", "GnuTLS::GnuTLS")
+        deps.set_property("libev", "cmake_file_name", "Libev")
+        deps.set_property("libev", "cmake_target_name", "Libev::Libev")
+        deps.set_property("libevent", "cmake_file_name", "Libevent2")
+        deps.set_property("libevent::core", "cmake_target_name", "Libevent2::Libevent_core")
+        deps.set_property("libidn2", "cmake_file_name", "Libidn2")
+        deps.set_property("libidn2", "cmake_target_name", "Libidn2::Libidn2")
+        deps.set_property("libuv", "cmake_file_name", "Libuv")
+        deps.set_property("libuv", "cmake_target_name", "Libuv::Libuv")
+        deps.set_property("nettle", "cmake_file_name", "Nettle")
+        deps.set_property("nettle", "cmake_target_name", "Nettle::Nettle")
+        deps.generate()
+
+        deps = PkgConfigDeps(self)
         deps.generate()
 
     def _patch_sources(self):
