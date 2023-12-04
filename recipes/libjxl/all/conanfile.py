@@ -77,6 +77,10 @@ class LibjxlConan(ConanFile):
         # Also, v0.9+ require CMake 3.16
         self.tool_requires("cmake/[>=3.19 <4]")
 
+    def validate(self):
+        if self.settings.compiler.cppstd:
+            check_min_cppstd(self, 11)
+
     def source(self):
         get(self, **self.conan_data["sources"][self.version], strip_root=True)
 
