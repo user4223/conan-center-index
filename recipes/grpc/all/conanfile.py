@@ -62,12 +62,20 @@ class GrpcConan(ConanFile):
     _target_info = None
 
     @property
-    def _grpc_plugin_template(self):
-        return "grpc_plugin_template.cmake.in"
+    def _min_cppstd(self):
+        return 14
 
     @property
-    def _cxxstd_required(self):
-        return 14 if Version(self.version) >= "1.47" else 11
+    def _compilers_minimum_version(self):
+        return {
+            "Visual Studio": "14",
+            "msvc": "190",
+            "gcc": "6",
+        }
+
+    @property
+    def _grpc_plugin_template(self):
+        return "grpc_plugin_template.cmake.in"
 
     @property
     def _is_legacy_one_profile(self):
@@ -116,7 +124,7 @@ class GrpcConan(ConanFile):
             self.requires("protobuf/3.21.12", transitive_headers=True)
         self.requires("c-ares/[>=1.19.1 <2]")
         self.requires("openssl/[>=1.1 <4]")
-        self.requires("re2/20230301")
+        self.requires("re2/20231101")
         self.requires("zlib/[>=1.2.11 <2]")
         if self.options.get_safe("with_libsystemd"):
             if Version(self.version) >= "1.67.0":
@@ -130,7 +138,14 @@ class GrpcConan(ConanFile):
         del self.info.options.secure
 
     def validate(self):
-        check_min_vs(self, "190")
+        if self.settings.compiler.cppstd:
+            check_min_cppstd(self, self._min_cppstd)
+        minimum_version = self._compilers_minimum_version.get(str(self.settings.compiler), False)
+        if minimum_version and Version(self.settings.compiler.version) < minimum_version:
+            raise ConanInvalidConfiguration(
+                f"{self.ref} requires C++{self._min_cppstd}, which your compiler does not support."
+            )
+
         if is_msvc(self) and self.options.shared:
             raise ConanInvalidConfiguration(f"{self.ref} shared not supported by Visual Studio")
 
@@ -199,8 +214,8 @@ class GrpcConan(ConanFile):
         tc.cache_variables["gRPC_BUILD_GRPCPP_OTEL_PLUGIN"] = self.options.get_safe("otel_plugin", False)
 
         # Consumed targets (abseil) via interface target_compiler_feature can propagate newer standards
-        if not valid_min_cppstd(self, self._cxxstd_required):
-            tc.cache_variables["CMAKE_CXX_STANDARD"] = self._cxxstd_required
+        if not valid_min_cppstd(self, self._min_cppstd):
+            tc.cache_variables["CMAKE_CXX_STANDARD"] = self._min_cppstd
 
         if is_apple_os(self):
             # workaround for: install TARGETS given no BUNDLE DESTINATION for MACOSX_BUNDLE executable
@@ -219,6 +234,12 @@ class GrpcConan(ConanFile):
 
     def _patch_sources(self):
         apply_conandata_patches(self)
+
+        # Inject abseil
+        replace_in_file(self, os.path.join(self.source_folder, "cmake", "abseil-cpp.cmake"),
+                        "find_package(absl REQUIRED CONFIG)",
+                        "find_package(absl REQUIRED CONFIG)\n"
+                        "include_directories(${absl_INCLUDE_DIRS})\n")
 
         # On macOS if all the following are true:
         # - protoc from protobuf has shared library dependencies
