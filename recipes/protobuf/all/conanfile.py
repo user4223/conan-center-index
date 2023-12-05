@@ -86,7 +86,6 @@ class ProtobufConan(ConanFile):
     def configure(self):
         if self.options.shared:
             self.options.rm_safe("fPIC")
-            # shared build protobuf requires Abseil as shared libraries to avoid ODR violations.
             if Version(self.version) >= "3.22.0" and is_msvc(self):
                 self.options["abseil"].shared = True
 
@@ -118,7 +117,6 @@ class ProtobufConan(ConanFile):
     def validate(self):
         if self.settings.compiler.cppstd:
             check_min_cppstd(self, self._min_cppstd)
-
         minimum_version = self._compilers_minimum_version.get(str(self.settings.compiler), False)
         if minimum_version and Version(self.settings.compiler.version) < minimum_version:
             raise ConanInvalidConfiguration(
