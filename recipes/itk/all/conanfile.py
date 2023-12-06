@@ -124,7 +124,6 @@ class ITKConan(ConanFile):
         tc.variables["ITK_USE_SYSTEM_FFTW"] = True
         tc.variables["ITK_USE_SYSTEM_GDCM"] = True
         tc.variables["ITK_USE_SYSTEM_HDF5"] = True
-        tc.variables["ITK_USE_SYSTEM_ICU"] = True
         tc.variables["ITK_USE_SYSTEM_JPEG"] = True
         tc.variables["ITK_USE_SYSTEM_PNG"] = True
         tc.variables["ITK_USE_SYSTEM_TIFF"] = True
@@ -243,8 +242,12 @@ class ITKConan(ConanFile):
 
         tc.generate()
 
-        tc = CMakeDeps(self)
-        tc.generate()
+        deps = CMakeDeps(self)
+        deps.set_property("fftw", "cmake_file_name", "FFTW")
+        # Use namespaced targets to avoid linking against plain library targets
+        deps.set_property("gdcm::gdcmMSFF", "cmake_target_name", "GDCM::gdcmMSFF")
+        deps.set_property("gdcm::gdcmDICT", "cmake_target_name", "GDCM::gdcmDICT")
+        deps.generate()
 
         venv = VirtualBuildEnv(self)
         venv.generate()
@@ -256,6 +259,15 @@ class ITKConan(ConanFile):
                         os.path.join(self.source_folder, "Modules", "ThirdParty", "VNL", "src", "vxl", "config", "cmake", "config", "VXLIntrospectionConfig.cmake"),
                         "-DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}",
                         "-DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}")
+        # Ensure that new versions don't introduce any vendored libs by accident
+        replace_in_file(self, os.path.join(self.source_folder, "CMakeLists.txt"), "include(ExternalProject)", "")
+        # Truncate some third-party modules that are provided by conan_cmake_project_include.cmake
+        for pkg in ["DCMTK", "DoubleConversion", "GDCM"]:
+            save(self, os.path.join(self.source_folder, "Modules", "ThirdParty", pkg, "CMakeLists.txt"),
+                 f"project(ITK{pkg})\n"
+                 f"set(ITK{pkg}_THIRD_PARTY 1)\n"
+                 f"set(ITK{pkg}_NO_SRC 1)\n"
+                 "itk_module_impl()\n")
 
     def build(self):
         self._patch_sources()
