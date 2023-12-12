@@ -1,4 +1,5 @@
 import os
+from io import StringIO
 
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
@@ -80,6 +81,7 @@ class LiquidDspConan(ConanFile):
             if not self.conf.get("tools.microsoft.bash:path", check_type=str):
                 self.tool_requires("msys2/cci.latest")
         if is_msvc(self):
+            # GCC from MinGW is required due to MSVC C99 not supporting complex float
             self.tool_requires("mingw-builds/12.2.0")
             self.tool_requires("automake/1.16.5")
 
@@ -118,14 +120,6 @@ class LiquidDspConan(ConanFile):
             autotools.make(self._target_name)
         self._rename_libraries()
 
-    @property
-    def _lib_pattern(self):
-        if is_apple_os(self) and not self.options.shared:
-            return "libliquid.a"
-        if self.settings.os != "Windows":
-            return self._target_name
-        return "libliquid.lib"
-
     def package(self):
         copy(self, "LICENSE",
              dst=os.path.join(self.package_folder, "licenses"),
@@ -136,12 +130,11 @@ class LiquidDspConan(ConanFile):
         copy(self, self._lib_pattern,
              dst=os.path.join(self.package_folder, "lib"),
              src=self.source_folder)
-
-    @property
-    def _libname(self):
-        if self.settings.os == "Windows":
-            return "libliquid"
-        return "liquid"
+        if is_msvc(self):
+            copy(self, "libgcc_*.dll",
+                 os.path.join(self.dependencies.build["mingw-builds"].package_folder, "bin"),
+                 os.path.join(self.package_folder, "bin"),
+                 keep_path=False)
 
     def package_info(self):
         self.cpp_info.libs = ["liquid"]
