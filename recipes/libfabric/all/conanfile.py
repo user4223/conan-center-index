@@ -5,8 +5,9 @@ from conan.errors import ConanInvalidConfiguration
 from conan.tools.apple import is_apple_os, fix_apple_shared_install_name
 from conan.tools.env import VirtualBuildEnv, VirtualRunEnv
 from conan.tools.files import copy, get, rm, rmdir
-from conan.tools.gnu import Autotools, AutotoolsToolchain, PkgConfigDeps
+from conan.tools.gnu import Autotools, AutotoolsToolchain, AutotoolsDeps
 from conan.tools.layout import basic_layout
+from conan.tools.scm import Version
 
 required_conan_version = ">=1.53.0"
 
@@ -28,6 +29,7 @@ class LibfabricConan(ConanFile):
         "hook_debug",
         "hook_hmem",
         "mrail",
+        "opx",
         "perf",
         "profile",
         "rxd",
@@ -130,9 +132,6 @@ class LibfabricConan(ConanFile):
     def generate(self):
         def yes_no_opt(opt):
             return "yes" if self.options.get_safe(opt) else "no"
-
-        def root(pkg):
-            return self.dependencies[pkg].package_folder
 
         tc = AutotoolsToolchain(self)
         for p in self._providers:
