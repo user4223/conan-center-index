@@ -161,6 +161,10 @@ class OpenMPIConan(ConanFile):
         replace_in_file(self, os.path.join(self.source_folder, "configure"),
                         "-I$(top_srcdir) ", "-idirafter$(top_srcdir) ")
 
+    def _patch_sources(self):
+        # Not needed and fails with v5.0 due to additional Python dependencies
+        save(self, os.path.join(self.source_folder, "docs", "Makefile.in"), "all:\ninstall:\n")
+
     def build(self):
         self._patch_sources()
         autotools = Autotools(self)
