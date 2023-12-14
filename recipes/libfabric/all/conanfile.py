@@ -5,7 +5,7 @@ from conan.errors import ConanInvalidConfiguration
 from conan.tools.apple import is_apple_os, fix_apple_shared_install_name
 from conan.tools.env import VirtualBuildEnv, VirtualRunEnv
 from conan.tools.files import copy, get, rm, rmdir
-from conan.tools.gnu import Autotools, AutotoolsToolchain, AutotoolsDeps
+from conan.tools.gnu import Autotools, AutotoolsToolchain, PkgConfigDeps
 from conan.tools.layout import basic_layout
 
 required_conan_version = ">=1.53.0"
@@ -99,6 +99,11 @@ class LibfabricConan(ConanFile):
     def layout(self):
         basic_layout(self, src_folder="src")
 
+    def package_id(self):
+        if not self.info.options.bgq:
+            del self.info.options.with_bgq_progress
+            del self.info.options.with_bgq_mr
+
     def validate(self):
         if self.settings.os == "Windows":
             # FIXME: libfabric provides msbuild project files.
@@ -123,6 +128,12 @@ class LibfabricConan(ConanFile):
         get(self, **self.conan_data["sources"][self.version], strip_root=True)
 
     def generate(self):
+        def yes_no_opt(opt):
+            return "yes" if self.options.get_safe(opt) else "no"
+
+        def root(pkg):
+            return self.dependencies[pkg].package_folder
+
         tc = AutotoolsToolchain(self)
         for p in self._providers:
             if p == "verbs" and self.options.get_safe(p, "no") != "no":
