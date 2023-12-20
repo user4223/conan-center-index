@@ -39,7 +39,7 @@ class UnleashConan(ConanFile):
             "gcc": "7",
             "clang": "4.0",
             "apple-clang": "3.8",
-            "intel": "17",
+            "intel-cc": "17",
         }
 
     def config_options(self):
