@@ -131,9 +131,6 @@ class FollyConan(ConanFile):
             required_components = ", ".join(self._required_boost_components)
             raise ConanInvalidConfiguration(f"{self.ref} requires these Boost components: {required_components}. Try with '-o boost/*:without_{required_components}=False'")
 
-    def build_requirements(self):
-        pass
-
     def source(self):
         get(self, **self.conan_data["sources"][self.version], strip_root=False)
 
@@ -176,6 +173,26 @@ class FollyConan(ConanFile):
         tc.generate()
 
         deps = CMakeDeps(self)
+        # deps.set_property("backtrace", "cmake_file_name", "Backtrace")
+        deps.set_property("boost", "cmake_file_name", "Boost")
+        deps.set_property("bzip2", "cmake_file_name", "BZip2")
+        deps.set_property("double-conversion", "cmake_file_name", "DoubleConversion")
+        deps.set_property("fmt", "cmake_file_name", "fmt")
+        deps.set_property("gflags", "cmake_file_name", "Gflags")
+        deps.set_property("glog", "cmake_file_name", "Glog")
+        # deps.set_property("libaio", "cmake_file_name", "LibAIO")
+        deps.set_property("libdwarf", "cmake_file_name", "LibDwarf")
+        deps.set_property("libevent", "cmake_file_name", "LibEvent")
+        deps.set_property("libiberty", "cmake_file_name", "Libiberty")
+        deps.set_property("libsodium", "cmake_file_name", "Libsodium")
+        deps.set_property("libunwind", "cmake_file_name", "LibUnwind")
+        # deps.set_property("liburing", "cmake_file_name", "LibUring")
+        deps.set_property("lz4", "cmake_file_name", "LZ4")
+        deps.set_property("openssl", "cmake_file_name", "OpenSSL")
+        deps.set_property("snappy", "cmake_file_name", "Snappy")
+        deps.set_property("xz_utils", "cmake_file_name", "LibLZMA")
+        deps.set_property("zlib", "cmake_file_name", "ZLIB")
+        deps.set_property("zstd", "cmake_file_name", "Zstd")
         deps.generate()
 
         # 2019.10.21.00 -> either MSVC_ flags or CXX_STD
