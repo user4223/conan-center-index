@@ -127,6 +127,8 @@ class LibfabricConan(ConanFile):
 
     def source(self):
         get(self, **self.conan_data["sources"][self.version], strip_root=True)
+        # Do suppress the linter error for libcxx not being removed despite no C++ source files
+        save(self, os.path.join(self.source_folder, "dummy.cpp"), "")
 
     def generate(self):
         def yes_no_opt(opt):
