@@ -68,11 +68,6 @@ class GlibmmConan(ConanFile):
         if self.dependencies["glib"].options.shared and is_msvc_static_runtime(self):
             raise ConanInvalidConfiguration("Linking shared glib with the MSVC static runtime is not supported")
 
-        if not self.options.shared and Version(self.version) >= "2.78":
-            # The project does not support static builds out of the box
-            # and extensive patching is required, including at the source code level.
-            raise ConanInvalidConfiguration("Static builds are not supported")
-
     def build_requirements(self):
         self.tool_requires("meson/[>=1.2.3 <2]")
         if not self.conf.get("tools.gnu:pkg_config", check_type=str):
@@ -106,11 +101,6 @@ class GlibmmConan(ConanFile):
             # conformant! see:
             # https://developercommunity.visualstudio.com/t/error-c2760-in-combaseapih-with-windows-sdk-81-and/185399
             replace_in_file(self, meson_build, "cpp_std=c++", "cpp_std=vc++")
-        if not self.options.shared:
-            replace_in_file(self, os.path.join(self.source_folder, "glib", "glibmmconfig.h.meson"),
-                            "#  define GLIBMM_DLL 1", "#  define GLIBMM_DLL 0")
-        replace_in_file(self, os.path.join(self.source_folder, "glib", "meson.build"),
-                        "error('Static builds are not supported by MSVC-style builds')", "")
 
     def build(self):
         self._patch_sources()
