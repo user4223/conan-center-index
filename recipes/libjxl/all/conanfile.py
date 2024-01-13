@@ -81,6 +81,10 @@ class LibjxlConan(ConanFile):
         if self.settings.compiler.cppstd:
             check_min_cppstd(self, 11)
 
+    def build_requirements(self):
+        if Version(self.version) >= "0.9":
+            self.tool_requires("cmake/[>=3.16 <4]")
+
     def source(self):
         get(self, **self.conan_data["sources"][self.version], strip_root=True)
 
