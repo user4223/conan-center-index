@@ -122,6 +122,10 @@ class FollyConan(ConanFile):
             # https://github.com/facebook/folly/issues/2266
             raise ConanInvalidConfiguration(f"{self.ref} could not be built by apple-clang < 14.0. Use apple-clang >= 14.0")
 
+        glog = self.dependencies["glog"]
+        if self.options.shared and not glog.options.shared:
+            raise ConanInvalidConfiguration(f"If Folly is built as shared lib, glog must be a shared lib too.")
+        
         boost = self.dependencies["boost"]
         if boost.options.header_only:
             raise ConanInvalidConfiguration(f"{self.ref} could not be built with a header only Boost. Use -o 'boost/*:header_only=False'")
