@@ -8,6 +8,9 @@ class TestPackageConan(ConanFile):
     def layout(self):
         basic_layout(self)
 
+    def layout(self):
+        basic_layout(self)
+
     def build_requirements(self):
         self.tool_requires(self.tested_reference_str)
 
