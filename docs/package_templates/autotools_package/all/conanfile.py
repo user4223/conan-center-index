@@ -76,7 +76,7 @@ class PackageConan(ConanFile):
     # if a tool other than the compiler or autotools is required to build the project (pkgconf, bison, flex etc)
     def build_requirements(self):
         # only if we have to call autoreconf
-        self.tool_requires("libtool/2.4.7")
+        self.tool_requires("libtool/x.y.z")
         # only if upstream configure.ac relies on PKG_CHECK_MODULES macro
         if not self.conf.get("tools.gnu:pkg_config", check_type=str):
             self.tool_requires("pkgconf/[>=2.2 <3]")
@@ -88,7 +88,7 @@ class PackageConan(ConanFile):
         # for msvc support to get compile & ar-lib scripts (may be avoided if shipped in source code of the library)
         # not needed if libtool already in build requirements
         if is_msvc(self):
-            self.tool_requires("automake/1.16.5")
+            self.tool_requires("automake/x.y.z")
 
     def source(self):
         get(self, **self.conan_data["sources"][self.version], strip_root=True)
