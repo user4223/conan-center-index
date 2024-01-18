@@ -7,6 +7,13 @@ foreach(_suffix RELEASE DEBUG RELWITHDEBINFO MINSIZEREL)
     endif()
 endforeach()
 
+# For Conan v1 compatibility
+foreach(_suffix RELEASE DEBUG RELWITHDEBINFO MINSIZEREL)
+    if(DEFINED OpenMP_OpenMP_INCLUDE_DIRS_${_suffix})
+      set(_v1_suffix _${_suffix})
+    endif()
+endforeach()
+
 set(OpenMP_C_FLAGS "@OpenMP_FLAGS@")
 set(OpenMP_C_INCLUDE_DIR "${OpenMP_INCLUDE_DIR${_v1_suffix}}")
 set(OpenMP_C_INCLUDE_DIRS "${OpenMP_INCLUDE_DIRS${_v1_suffix}}")
