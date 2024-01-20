@@ -43,8 +43,11 @@ class GetDnsConan(ConanFile):
     def config_options(self):
         if self.settings.os == "Windows":
             del self.options.fPIC
-        self.options.stub_only = self.settings.os != "Windows"
-        # FIXME: uncomment the next line when libunbound is available
+        # FIXME: remove once libidn2 has been migrated
+        # https://github.com/conan-io/conan-center-index/pull/18642
+        self.options.with_libidn2 = conan_version.major == 1
+        # FIXME: uncomment once libunbound is available
+        # self.options.stub_only = self.settings.os != "Windows"
         self.options.with_libev = True  # self.settings.os == "Windows"
 
     def configure(self):
