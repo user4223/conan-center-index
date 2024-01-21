@@ -4,8 +4,8 @@ from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
 from conan.tools.apple import XCRun, to_apple_arch, fix_apple_shared_install_name
 from conan.tools.build import cross_building
-from conan.tools.env import VirtualBuildEnv, VirtualRunEnv, Environment
-from conan.tools.files import apply_conandata_patches, copy, export_conandata_patches, get, rm, rmdir, chdir, replace_in_file
+from conan.tools.env import VirtualBuildEnv, VirtualRunEnv
+from conan.tools.files import apply_conandata_patches, copy, export_conandata_patches, get, rm, rmdir, chdir
 from conan.tools.gnu import Autotools, AutotoolsToolchain, AutotoolsDeps
 from conan.tools.layout import basic_layout
 from conan.tools.microsoft import is_msvc
@@ -32,10 +32,6 @@ class PbcConan(ConanFile):
         "shared": False,
         "fPIC": True,
     }
-
-    @property
-    def _settings_build(self):
-        return getattr(self, "settings_build", self.settings)
 
     def export_sources(self):
         export_conandata_patches(self)
@@ -117,13 +113,10 @@ class PbcConan(ConanFile):
             replace_in_file(self, configure, 'LIBS="-lm $LIBS"', "")
 
     def build(self):
-        self._patch_sources()
+        apply_conandata_patches(self)
         with chdir(self, self.source_folder):
             autotools = Autotools(self)
             autotools.configure()
-            if is_msvc(self):
-                # Drop GCC/Clang flags
-                replace_in_file(self, "Makefile", "CFLAGS = ", "CFLAGS = # ")
             autotools.make()
 
     def package(self):
