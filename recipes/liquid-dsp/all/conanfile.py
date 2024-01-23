@@ -130,13 +130,28 @@ class LiquidDspConan(ConanFile):
         copy(self, self._lib_pattern,
              dst=os.path.join(self.package_folder, "lib"),
              src=self.source_folder)
+
         if is_msvc(self):
-            copy(self, "libgcc_*.dll",
-                 os.path.join(self.dependencies.build["mingw-builds"].package_folder, "bin"),
-                 os.path.join(self.package_folder, "bin"),
-                 keep_path=False)
+            # Package MinGW runtime libraries since Conan lacks support for proper handling of compiler runtime libs
+            mingw = self.dependencies.build["mingw-builds"].package_folder
+            if self.options.shared:
+                copy(self, "libgcc_s*.dll", os.path.join(mingw, "bin"), os.path.join(self.package_folder, "bin"), keep_path=False)
+                copy(self, "libgcc_s.a", os.path.join(mingw, "lib", "gcc", f"{self.settings.arch}-w64-mingw32", "lib"), os.path.join(self.package_folder, "lib"))
+            else:
+                copy(self, "libgcc.a", os.path.join(mingw, "lib", "gcc", f"{self.settings.arch}-w64-mingw32", "12.2.0"), os.path.join(self.package_folder, "lib"))
+            copy(self, "libmingwex.a", os.path.join(mingw, f"{self.settings.arch}-w64-mingw32", "lib"), os.path.join(self.package_folder, "lib"))
+            for lib in ["libgcc", "libgcc_s", "libmingwex"]:
+                if os.path.exists(os.path.join(self.package_folder, "lib", f"{lib}.a")):
+                    rename(self, os.path.join(self.package_folder, "lib", f"{lib}.a"),
+                           os.path.join(self.package_folder, "lib", f"{lib}.lib"))
 
     def package_info(self):
         self.cpp_info.libs = ["liquid"]
         if self.settings.os in ["Linux", "FreeBSD"]:
             self.cpp_info.system_libs.append("m")
+        if is_msvc(self):
+            if self.options.shared:
+                self.cpp_info.libs.append("libgcc_s")
+            else:
+                self.cpp_info.libs.append("libgcc")
+            self.cpp_info.libs.append("libmingwex")
