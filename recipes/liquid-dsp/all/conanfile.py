@@ -1,4 +1,5 @@
 import os
+import re
 from io import StringIO
 
 from conan import ConanFile
