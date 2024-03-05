@@ -453,6 +453,11 @@ class LLVMCoreConan(ConanFile):
             (self._package_folder_path / self._build_module_file_rel_path).as_posix()
         )
 
+    def package_id(self):
+        del self.info.options.use_llvm_cmake_files
+        del self.info.options.ram_per_compile_job
+        del self.info.options.ram_per_link_job
+
     def package_info(self):
         self.cpp_info.set_property("cmake_file_name", "LLVM")
         self.cpp_info.set_property("cmake_build_modules",
