@@ -428,6 +428,8 @@ class LLVMCoreConan(ConanFile):
         copy(self, "LICENSE.TXT", self.source_folder, (self._package_folder_path / "licenses").as_posix())
         cmake = CMake(self)
         cmake.install()
+        package_folder = Path(self.package_folder)
+        rmdir(self, package_folder / "lib" / "cmake")
 
         build_info = self._write_build_info()
 
