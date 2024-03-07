@@ -429,8 +429,8 @@ class LLVMCoreConan(ConanFile):
         cmake = CMake(self)
         cmake.install()
         package_folder = Path(self.package_folder)
-        rmdir(self, package_folder / "lib" / "cmake")
-        rmdir(self, package_folder / "share")
+        #rmdir(self, package_folder / "lib" / "cmake")
+        #rmdir(self, package_folder / "share")
 
         build_info = self._write_build_info()
 
