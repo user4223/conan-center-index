@@ -1,3 +1,5 @@
+import textwrap
+
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
 from conan.tools.apple import is_apple_os
@@ -428,9 +430,6 @@ class LLVMCoreConan(ConanFile):
         copy(self, "LICENSE.TXT", self.source_folder, (self._package_folder_path / "licenses").as_posix())
         cmake = CMake(self)
         cmake.install()
-        package_folder = Path(self.package_folder)
-        #rmdir(self, package_folder / "lib" / "cmake")
-        #rmdir(self, package_folder / "share")
 
         build_info = self._write_build_info()
 
