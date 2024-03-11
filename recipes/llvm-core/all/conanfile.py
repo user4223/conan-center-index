@@ -143,9 +143,6 @@ class LLVMCoreConan(ConanFile):
     def configure(self):
         if self.options.shared:
             self.options.rm_safe("fPIC")
-        if os.getenv("CONAN_CENTER_BUILD_SERVICE"):
-            self.options.ram_per_compile_job = "2048"
-            self.options.ram_per_link_job = "16384"
 
     def layout(self):
         cmake_layout(self, src_folder="src")
