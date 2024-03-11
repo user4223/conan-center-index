@@ -117,6 +117,10 @@ class LLVMCoreConan(ConanFile):
     default_options.update({f"with_target_{target.lower()}": True for target in LLVM_TARGETS})
 
     @property
+    def _llvm_major_version(self):
+        return Version(self.version).major
+
+    @property
     def _min_cppstd(self):
         return 14
 
@@ -159,7 +163,9 @@ class LLVMCoreConan(ConanFile):
         if self.options.with_xml2:
             self.requires("libxml2/[>=2.12.5 <3]")
         if self.options.with_z3:
-            self.requires("z3/4.13.0")
+            self.requires("z3/4.12.4")
+        if self.options.with_zstd:
+            self.requires("zstd/1.5.5")
 
     def build_requirements(self):
         self.tool_requires("ninja/[>=1.10.2 <2]")
@@ -203,7 +209,13 @@ class LLVMCoreConan(ConanFile):
                 raise ConanInvalidConfiguration("Shared Debug build is not supported on CCI due to resource limitations")
 
     def source(self):
-        get(self, **self.conan_data["sources"][self.version], strip_root=True)
+        sources = self.conan_data["sources"][self.version]
+        if self._llvm_major_version < 18:
+            get(**sources, strip_root=True)
+        else:
+            get(self, **sources["llvm"], destination='llvm-main', strip_root=True)
+            get(self, **sources["cmake"], destination='cmake', strip_root=True)
+            get(self, **sources["third-party"], destination='third-party', strip_root=True)
 
     def _apply_resource_limits(self, cmake_definitions):
         if os.getenv("CONAN_CENTER_BUILD_SERVICE"):
@@ -311,7 +323,10 @@ class LLVMCoreConan(ConanFile):
     def build(self):
         apply_conandata_patches(self)
         cmake = CMake(self)
-        cmake.configure()
+        if self._llvm_major_version < 18:
+            cmake.configure()
+        else:
+            cmake.configure(build_script_folder="llvm-main")
         cmake.build()
 
     @property
@@ -328,6 +343,7 @@ class LLVMCoreConan(ConanFile):
         def _sanitized_components(deps_list):
             match_genex = re.compile(r"""\\\$<LINK_ONLY:(.+)>""")
             replacements = {
+                "zstd::libzstd_static": "zstd::zstd",
                 "LibXml2::LibXml2": "libxml2::libxml2",
                 "ZLIB::ZLIB": "zlib::zlib"
             }
