@@ -70,7 +70,6 @@ class LLVMCoreConan(ConanFile):
         "shared": [True, False],
         "fPIC": [True, False],
         "components": ["ANY"],
-        "targets": ["ANY"],
         "exceptions": [True, False],
         "rtti": [True, False],
         "threads": [True, False],
@@ -96,11 +95,11 @@ class LLVMCoreConan(ConanFile):
         "with_xml2": [True, False],
         "with_z3": [True, False],
     }
+    options.update({f"with_target_{target.lower()}": [True, False] for target in LLVM_TARGETS.split(";")})
     default_options = {
         "shared": False,
         "fPIC": True,
         "components": "all",
-        "targets": "all",
         "exceptions": True,
         "rtti": True,
         "threads": True,
@@ -117,6 +116,7 @@ class LLVMCoreConan(ConanFile):
         "with_z3": True,
         "with_zlib": True,
     }
+    default_options.update({f"with_target_{target.lower()}": True for target in LLVM_TARGETS.split(";")})
 
     @property
     def _min_cppstd(self):
@@ -134,6 +134,10 @@ class LLVMCoreConan(ConanFile):
 
     def export_sources(self):
         export_conandata_patches(self)
+
+    @property
+    def _major_version(self):
+        return Version(self.version).major
 
     def config_options(self):
         if self.settings.os == "Windows":
@@ -228,6 +232,17 @@ class LLVMCoreConan(ConanFile):
     def _all_targets(self):
         targets = LLVM_TARGETS if Version(self.version) >= 14 else LLVM_TARGETS - {"LoongArch", "VE"}
         return ";".join(targets)
+
+    @property
+    def _targets_to_build(self):
+        return ";".join(target for target in LLVM_TARGETS.split(";") if self.options.get_safe(f"with_target_{target.lower()}"))
+
+    @property
+    def _all_targets(self):
+        # This is not just LLVM_TARGETS as it is version specific
+        return ";".join(
+            target for target in LLVM_TARGETS.split(";") if
+            self.options.get_safe(f"with_target_{target.lower()}") is not None)
 
     def generate(self):
         tc = CMakeToolchain(self, generator="Ninja")
@@ -458,7 +473,6 @@ class LLVMCoreConan(ConanFile):
         )
 
     def package_id(self):
-        del self.info.options.use_llvm_cmake_files
         del self.info.options.ram_per_compile_job
         del self.info.options.ram_per_link_job
 
