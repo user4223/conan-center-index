@@ -9,7 +9,7 @@ from conan.tools.scm import Version
 
 import os
 
-required_conan_version = ">=1.53"
+required_conan_version = ">=1.53.0"
 
 
 class ProtobufConan(ConanFile):
