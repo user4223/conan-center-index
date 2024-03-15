@@ -61,7 +61,7 @@ class LLVMCoreConan(ConanFile):
         "A toolkit for the construction of highly optimized compilers,"
         "optimizers, and runtime environments."
     )
-    license = "Apache-2.0 WITH LLVM-exception"
+    license = "LLVM-exception"
     topics = ("llvm", "compiler")
     homepage = "https://llvm.org"
     url = "https://github.com/conan-io/conan-center-index"
@@ -95,7 +95,7 @@ class LLVMCoreConan(ConanFile):
         "with_xml2": [True, False],
         "with_z3": [True, False],
     }
-    options.update({f"with_target_{target.lower()}": [True, False] for target in LLVM_TARGETS.split(";")})
+    options.update({f"with_target_{target.lower()}": [True, False] for target in LLVM_TARGETS})
     default_options = {
         "shared": False,
         "fPIC": True,
@@ -116,7 +116,7 @@ class LLVMCoreConan(ConanFile):
         "with_z3": True,
         "with_zlib": True,
     }
-    default_options.update({f"with_target_{target.lower()}": True for target in LLVM_TARGETS.split(";")})
+    default_options.update({f"with_target_{target.lower()}": True for target in LLVM_TARGETS})
 
     @property
     def _min_cppstd(self):
@@ -204,6 +204,9 @@ class LLVMCoreConan(ConanFile):
             elif self.options.shared:
                 raise ConanInvalidConfiguration("Shared Debug build is not supported on CCI due to resource limitations")
 
+        if os.getenv("CONAN_CENTER_BUILD_SERVICE") and self.options.shared and self.settings.build_type == "Debug":
+            raise ConanInvalidConfiguration("Shared Debug build is not supported on CCI due to resource limitations")
+
     def source(self):
         get(self, **self.conan_data["sources"][self.version], strip_root=True)
 
@@ -235,14 +238,13 @@ class LLVMCoreConan(ConanFile):
 
     @property
     def _targets_to_build(self):
-        return ";".join(target for target in LLVM_TARGETS.split(";") if self.options.get_safe(f"with_target_{target.lower()}"))
+        return ";".join(target for target in LLVM_TARGETS if self.options.get_safe(f"with_target_{target.lower()}"))
 
     @property
     def _all_targets(self):
         # This is not just LLVM_TARGETS as it is version specific
         return ";".join(
-            target for target in LLVM_TARGETS.split(";") if
-            self.options.get_safe(f"with_target_{target.lower()}") is not None)
+            target for target in LLVM_TARGETS if self.options.get_safe(f"with_target_{target.lower()}") is not None)
 
     def generate(self):
         tc = CMakeToolchain(self, generator="Ninja")
