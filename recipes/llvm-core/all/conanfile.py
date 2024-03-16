@@ -1,5 +1,3 @@
-import textwrap
-
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
 from conan.tools.apple import is_apple_os
@@ -203,9 +201,6 @@ class LLVMCoreConan(ConanFile):
                 raise ConanInvalidConfiguration("Debug build is not supported on CCI due to resource limitations")
             elif self.options.shared:
                 raise ConanInvalidConfiguration("Shared Debug build is not supported on CCI due to resource limitations")
-
-        if os.getenv("CONAN_CENTER_BUILD_SERVICE") and self.options.shared and self.settings.build_type == "Debug":
-            raise ConanInvalidConfiguration("Shared Debug build is not supported on CCI due to resource limitations")
 
     def source(self):
         get(self, **self.conan_data["sources"][self.version], strip_root=True)
