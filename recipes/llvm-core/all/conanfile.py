@@ -401,6 +401,10 @@ class LLVMCoreConan(ConanFile):
         return Path("lib") / "cmake" / "llvm"
 
     @property
+    def _build_info_file(self):
+        return Path(self.package_folder) / self._cmake_module_path / "conan_llvm_build_info.json"
+
+    @property
     def _build_module_file_rel_path(self):
         return self._cmake_module_path / f"conan-official-{self.name}-variables.cmake"
 
