@@ -318,6 +318,12 @@ class LLVMCoreConan(ConanFile):
     def _package_folder_path(self):
         return Path(self.package_folder)
 
+    @staticmethod
+    def load(filename):
+        # regex fails on Windows when using conan's built in 'load' method
+        with open(filename, "r", encoding="utf-8")as fp:
+            return fp.read()
+
     def _update_component_dependencies(self, components):
         def _sanitized_components(deps_list):
             match_genex = re.compile(r"""\\\$<LINK_ONLY:(.+)>""")
