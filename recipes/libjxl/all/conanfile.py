@@ -82,7 +82,7 @@ class LibjxlConan(ConanFile):
             check_min_cppstd(self, 11)
         if self.version == "0.6.1" and is_msvc(self) and self.settings.build_type == "Debug":
             # Fails with a missing DLL error in test_package
-            raise ConanInvalidConfiguration(f"{self.ref} does not support Debug builds with MSVC")
+            raise ConanInvalidConfiguration(f"{self.ref} does not support shared builds with MSVC")
 
     def build_requirements(self):
         # Require newer CMake, which allows INCLUDE_DIRECTORIES to be set on INTERFACE targets
