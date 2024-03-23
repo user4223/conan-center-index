@@ -4,6 +4,8 @@
 
 #include <unleash/unleashclient.h>
 
+#include <iostream>
+
 int main() {
     unleash::UnleashClient unleashClient = unleash::UnleashClient::create("production", "https://www.apple.com/%");
     std::cout << "feature.toggle - is enabled: " << std::boolalpha << unleashClient.isEnabled("feature.toogle") << '\n';
