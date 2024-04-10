@@ -64,7 +64,7 @@ class ImageMagicConan(ConanFile):
         "with_jbig": True,
         "with_jpeg": "libjpeg",
         "with_openjp2": True,
-        "with_pango": False,  # FIXME: re-enable once migrated
+        "with_pango": True,
         "with_png": True,
         "with_tiff": True,
         "with_webp": True,
@@ -121,7 +121,7 @@ class ImageMagicConan(ConanFile):
         if self.options.with_tiff:
             self.requires("libtiff/4.6.0")
         if self.options.with_webp:
-            self.requires("libwebp/1.3.2")
+            self.requires("libwebp/1.4.0")
         if self.options.with_xml2:
             self.requires("libxml2/[>=2.12.5 <3]")
         if self.options.with_freetype:
