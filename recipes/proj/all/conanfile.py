@@ -3,7 +3,7 @@ from conan.tools.apple import is_apple_os
 from conan.tools.build import stdcpp_library
 from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
 from conan.tools.env import VirtualBuildEnv, VirtualRunEnv
-from conan.tools.files import get, copy, rmdir, replace_in_file, collect_libs, rename
+from conan.tools.files import apply_conandata_patches, export_conandata_patches, get, copy, rmdir, replace_in_file, collect_libs, rm, rename
 from conan.tools.microsoft import is_msvc
 from conan.tools.scm import Version
 import os
@@ -42,7 +42,7 @@ class ProjConan(ConanFile):
         return not hasattr(self, "settings_build")
 
     def export_sources(self):
-        copy(self, "conan_deps.cmake", self.recipe_folder, os.path.join(self.export_sources_folder, "src"))
+        export_conandata_patches(self)
 
     def config_options(self):
         if self.settings.os == "Windows":
@@ -83,7 +83,6 @@ class ProjConan(ConanFile):
             env.generate(scope="build")
 
         tc = CMakeToolchain(self)
-        tc.variables["CMAKE_PROJECT_PROJ_INCLUDE"] = "conan_deps.cmake"
         tc.variables["USE_THREAD"] = self.options.threadsafe
         tc.variables["BUILD_CCT"] = self.options.build_executables
         tc.variables["BUILD_CS2CS"] = self.options.build_executables
@@ -115,10 +114,11 @@ class ProjConan(ConanFile):
         tc.generate()
 
         deps = CMakeDeps(self)
-        deps.set_property("sqlite3", "cmake_file_name", "SQLite3")
         deps.generate()
 
     def _patch_sources(self):
+        apply_conandata_patches(self)
+
         cmakelists = os.path.join(self.source_folder, "CMakeLists.txt")
 
         replace_in_file(self, cmakelists, "/W4", "")
