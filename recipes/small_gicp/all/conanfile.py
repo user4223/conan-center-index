@@ -113,6 +113,23 @@ class IridescenceConan(ConanFile):
         rm(self, "*.pdb", os.path.join(self.package_folder, "lib"))
         rm(self, "*.pdb", os.path.join(self.package_folder, "bin"))
 
+    @property
+    def _openmp_flags(self):
+        # Based on https://github.com/Kitware/CMake/blob/v3.28.1/Modules/FindOpenMP.cmake#L104-L135
+        if self.settings.compiler == "clang":
+            return ["-fopenmp=libomp"]
+        elif self.settings.compiler == "apple-clang":
+            return ["-Xclang", "-fopenmp"]
+        elif self.settings.compiler == "gcc":
+            return ["-fopenmp"]
+        elif self.settings.compiler == "intel-cc":
+            return ["-Qopenmp"]
+        elif self.settings.compiler == "sun-cc":
+            return ["-xopenmp"]
+        if is_msvc(self):
+            return ["-openmp"]
+        return None
+
     def package_info(self):
         self.cpp_info.set_property("cmake_file_name", "small_gicp")
         self.cpp_info.set_property("cmake_target_name", "small_gicp::small_gicp")
