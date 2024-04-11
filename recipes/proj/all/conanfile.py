@@ -83,6 +83,7 @@ class ProjConan(ConanFile):
             env.generate(scope="build")
 
         tc = CMakeToolchain(self)
+        tc.variables["CMAKE_PROJECT_PROJ_INCLUDE"] = "conan_deps.cmake"
         tc.variables["USE_THREAD"] = self.options.threadsafe
         tc.variables["BUILD_CCT"] = self.options.build_executables
         tc.variables["BUILD_CS2CS"] = self.options.build_executables
