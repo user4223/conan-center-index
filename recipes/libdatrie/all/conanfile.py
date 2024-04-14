@@ -9,6 +9,7 @@ from conan.tools.files import apply_conandata_patches, copy, export_conandata_pa
 from conan.tools.gnu import Autotools, AutotoolsDeps, AutotoolsToolchain
 from conan.tools.layout import basic_layout
 from conan.tools.microsoft import is_msvc, unix_path
+from conans.errors import ConanInvalidConfiguration
 
 required_conan_version = ">=1.54.0"
 
@@ -56,6 +57,11 @@ class LibdatrieConan(ConanFile):
 
     def requirements(self):
         self.requires("libiconv/1.17")
+
+    def validate(self):
+        if is_apple_os(self) and self.options.shared:
+            # Fails due to build script bugs
+            raise ConanInvalidConfiguration("shared builds on Apple OS-s are not supported. Contributions are welcome!")
 
     def validate(self):
         if is_apple_os(self) and self.options.shared:
