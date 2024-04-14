@@ -9,7 +9,6 @@ from conan.tools.files import apply_conandata_patches, copy, export_conandata_pa
 from conan.tools.gnu import Autotools, AutotoolsDeps, AutotoolsToolchain
 from conan.tools.layout import basic_layout
 from conan.tools.microsoft import is_msvc, unix_path
-from conans.errors import ConanInvalidConfiguration
 
 required_conan_version = ">=1.54.0"
 
