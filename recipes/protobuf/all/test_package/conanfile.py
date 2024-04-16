@@ -5,6 +5,7 @@ from conan.tools.scm import Version
 import os
 
 from conan.tools.env import VirtualRunEnv
+import os
 
 
 class TestPackageConan(ConanFile):
