@@ -4,10 +4,12 @@ from conan.tools.cmake import cmake_layout, CMake, CMakeToolchain
 from conan.tools.scm import Version
 import os
 
+from conan.tools.env import VirtualRunEnv
+
 
 class TestPackageConan(ConanFile):
     settings = "os", "arch", "compiler", "build_type"
-    generators = "CMakeDeps", "VirtualBuildEnv", "VirtualRunEnv"
+    generators = "CMakeDeps"
     test_type = "explicit"
 
     def layout(self):
@@ -18,6 +20,11 @@ class TestPackageConan(ConanFile):
         self.requires(self.tested_reference_str, run=True)
 
     def generate(self):
+        venv = VirtualRunEnv(self)
+        venv.generate(scope="run")
+        # Needed for the CI workaround.
+        venv.generate(scope="build")
+
         tc = CMakeToolchain(self)
         tc.cache_variables["protobuf_LITE"] = self.dependencies[self.tested_reference_str].options.lite
         protobuf_version = Version(self.dependencies[self.tested_reference_str].ref.version)
@@ -31,7 +38,7 @@ class TestPackageConan(ConanFile):
 
     def test(self):
         if can_run(self):
-            bin_path = os.path.join(self.cpp.build.bindirs[0], "test_package")
+            bin_path = os.path.join(self.cpp.build.bindir, "test_package")
             self.run(bin_path, env="conanrun")
 
             # Invoke protoc in the same way CMake would
