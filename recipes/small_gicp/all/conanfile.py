@@ -127,7 +127,7 @@ class IridescenceConan(ConanFile):
         elif self.settings.compiler == "sun-cc":
             return ["-xopenmp"]
         if is_msvc(self):
-            return ["-openmp"]
+            return ["-openmp:llvm"]
         return None
 
     def package_info(self):
