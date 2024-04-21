@@ -102,6 +102,10 @@ class LibphonenumberConan(ConanFile):
         if conan_version.major == 1:
             raise ConanInvalidConfiguration("Conan 1.x is not supported. Contributions are welcome!")
 
+        if not self.options.use_icu_regexp:
+            # Fails with 'undefined reference to `vtable for i18n::phonenumbers::ICURegExpFactory''
+            raise ConanInvalidConfiguration("use_icu_regexp=False is not supported")
+
     def build_requirements(self):
         if not self.conf.get("tools.gnu:pkg_config", check_type=str):
             self.tool_requires("pkgconf/2.2.0")
