@@ -96,6 +96,13 @@ class OpenblasConan(ConanFile):
         "dynamic_arch": "Include support for multiple CPU targets, with automatic selection at runtime (x86/x86_64, aarch64 or ppc only)",
         "target": "OpenBLAS TARGET variable (see TargetList.txt)",
     }
+    options_description = {
+        "build_lapack": "Build LAPACK and LAPACKE",
+        "build_relapack": "Build with ReLAPACK (recursive implementation of several LAPACK functions on top of standard LAPACK)",
+        "use_thread": "Enable threads support",
+        "use_locking": "Use locks even in single-threaded builds to make them callable from multiple threads",
+        "dynamic_arch": "Include support for multiple CPU targets, with automatic selection at runtime (x86/x86_64, aarch64 or ppc only)",
+    }
     short_paths = True
 
     @property
@@ -150,6 +157,9 @@ class OpenblasConan(ConanFile):
         # we couldn't infer the target from settings.arch, fail
         if cross_building(self, skip_x64_x86=True) and not self.options.target:
             raise ConanInvalidConfiguration(f'Could not determine OpenBLAS TARGET. Please set the "{self.name}/*:target=XXX" option.')
+
+        if self.options.build_relapack and not self.options.build_lapack:
+            raise ConanInvalidConfiguration("build_relapack option requires build_lapack")
 
     def source(self):
         get(self, **self.conan_data["sources"][self.version], strip_root=True)
