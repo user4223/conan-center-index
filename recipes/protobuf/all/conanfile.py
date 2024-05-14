@@ -69,11 +69,7 @@ class ProtobufConan(ConanFile):
                 "Visual Studio": "15",
                 "msvc": "191",
             }
-        return {
-            "clang": "4",
-            "Visual Studio": "14",
-            "msvc": "190",
-        }
+        return {}
 
     def export_sources(self):
         export_conandata_patches(self)
@@ -87,6 +83,8 @@ class ProtobufConan(ConanFile):
         if self.options.shared:
             self.options.rm_safe("fPIC")
             if Version(self.version) >= "3.22.0" and is_msvc(self):
+                # Protobuf requires absl::abseil_dll
+                # https://github.com/protocolbuffers/protobuf/blob/v25.3/cmake/abseil-cpp.cmake#L40
                 self.options["abseil"].shared = True
 
         if self._protobuf_release < "27.0":
