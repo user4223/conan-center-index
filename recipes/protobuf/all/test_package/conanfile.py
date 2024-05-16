@@ -10,7 +10,7 @@ import os
 
 class TestPackageConan(ConanFile):
     settings = "os", "arch", "compiler", "build_type"
-    generators = "CMakeDeps", "VirtualBuildEnv", "VirtualRunEnv"
+    generators = "CMakeDeps", "VirtualBuildEnv"
     test_type = "explicit"
 
     def layout(self):
@@ -21,6 +21,9 @@ class TestPackageConan(ConanFile):
         self.requires(self.tested_reference_str, run=True)
 
     def generate(self):
+        venv = VirtualRunEnv(self)
+        venv.generate(scope="build")
+        venv.generate(scope="run")
         tc = CMakeToolchain(self)
         tc.cache_variables["protobuf_LITE"] = self.dependencies[self.tested_reference_str].options.lite
         protobuf_version = Version(self.dependencies[self.tested_reference_str].ref.version)
@@ -34,10 +37,5 @@ class TestPackageConan(ConanFile):
 
     def test(self):
         if can_run(self):
-            bin_path = os.path.join(self.cpp.build.bindirs[0], "test_package")
+            bin_path = os.path.join(self.cpp.build.bindir, "test_package")
             self.run(bin_path, env="conanrun")
-
-            # Invoke protoc in the same way CMake would
-            self.run(f"protoc --proto_path={self.source_folder} --cpp_out={self.build_folder} {self.source_folder}/addressbook.proto", env="conanrun")
-            assert os.path.exists(os.path.join(self.build_folder,"addressbook.pb.cc"))
-            assert os.path.exists(os.path.join(self.build_folder,"addressbook.pb.h"))
