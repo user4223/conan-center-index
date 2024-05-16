@@ -253,13 +253,12 @@ class ProtobufConan(ConanFile):
         self.cpp_info.set_property("pkg_config_name", "protobuf_full_package") # unofficial, but required to avoid side effects (libprotobuf component "steals" the default global pkg_config name)
 
         build_modules = [
-            os.path.join(self._cmake_install_base_path, "protobuf-generate.cmake"),
             os.path.join(self._cmake_install_base_path, "protobuf-module.cmake"),
             os.path.join(self._cmake_install_base_path, "protobuf-options.cmake"),
             os.path.join(self._cmake_install_base_path, "protobuf-conan-protoc-target.cmake"),
         ]
         if Version(self.version) >= "3.22.0":
-            build_modules.append(os.path.join(self._cmake_install_base_path, "protobuf-protoc.cmake"))
+            build_modules.append(os.path.join(self._cmake_install_base_path, "protobuf-generate.cmake"))
         self.cpp_info.set_property("cmake_build_modules", build_modules)
 
         lib_prefix = "lib" if (is_msvc(self) or self._is_clang_cl) else ""
@@ -340,7 +339,7 @@ class ProtobufConan(ConanFile):
         # TODO: to remove in conan v2 once cmake_find_package* & pkg_config generators removed
         self.cpp_info.filenames["cmake_find_package"] = "Protobuf"
         self.cpp_info.filenames["cmake_find_package_multi"] = "protobuf"
-        self.cpp_info.names["pkg_config"] ="protobuf_full_package"
+        self.cpp_info.names["pkg_config"] = "protobuf_full_package"
         for generator in ["cmake_find_package", "cmake_find_package_multi"]:
             self.cpp_info.components["libprotobuf"].build_modules[generator] = build_modules
         if self.options.lite:
