@@ -24,6 +24,7 @@ class TestPackageConan(ConanFile):
         venv = VirtualRunEnv(self)
         venv.generate(scope="build")
         venv.generate(scope="run")
+
         tc = CMakeToolchain(self)
         tc.cache_variables["protobuf_LITE"] = self.dependencies[self.tested_reference_str].options.lite
         protobuf_version = Version(self.dependencies[self.tested_reference_str].ref.version)
