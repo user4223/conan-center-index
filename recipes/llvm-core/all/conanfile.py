@@ -241,20 +241,6 @@ class LLVMCoreConan(ConanFile):
         return ";".join(
             target for target in LLVM_TARGETS if self.options.get_safe(f"with_target_{target.lower()}") is not None)
 
-    @property
-    def _msvcrt(self):
-        msvcrt = str(self.settings.compiler.runtime)
-        # handle conan legacy setting
-        if msvcrt in ["MDd", "MTd", "MD", "MT"]:
-            return msvcrt
-
-        if self.settings.build_type in ["Debug", "RelWithDebInfo"]:
-            crt = {"static": "MTd", "dynamic": "MDd"}
-        else:
-            crt = {"static": "MT", "dynamic": "MD"}
-
-        return crt[msvcrt]
-
     def generate(self):
         tc = CMakeToolchain(self, generator="Ninja")
         # https://releases.llvm.org/12.0.0/docs/CMake.html
