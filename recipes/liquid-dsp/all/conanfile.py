@@ -1,6 +1,4 @@
 import os
-import re
-from io import StringIO
 
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
@@ -77,13 +75,6 @@ class LiquidDspConan(ConanFile):
         self.tool_requires("automake/1.16.5")
 
     def build_requirements(self):
-        if self._settings_build.os == "Windows":
-            if is_msvc(self):
-                # GCC from MinGW is used due to MSVC C99 not supporting complex float
-                self.tool_requires("mingw-builds/12.2.0")
-            self.win_bash = True
-            if not self.conf.get("tools.microsoft.bash:path", check_type=str):
-                self.tool_requires("msys2/cci.latest")
         # For ./bootstrap.sh
         self.tool_requires("autoconf/2.71")
         self.tool_requires("automake/1.16.5")
@@ -134,27 +125,7 @@ class LiquidDspConan(ConanFile):
              dst=os.path.join(self.package_folder, "lib"),
              src=self.source_folder)
 
-        if is_msvc(self):
-            # Package MinGW runtime libraries since Conan lacks support for proper handling of compiler runtime libs
-            mingw = self.dependencies.build["mingw-builds"].package_folder
-            if self.options.shared:
-                copy(self, "*.dll", os.path.join(mingw, "bin"), os.path.join(self.package_folder, "bin"), keep_path=False)
-                copy(self, "libgcc_s.a", os.path.join(mingw, "lib", "gcc", f"{self.settings.arch}-w64-mingw32", "lib"), os.path.join(self.package_folder, "lib"))
-            else:
-                copy(self, "libgcc.a", os.path.join(mingw, "lib", "gcc", f"{self.settings.arch}-w64-mingw32", "12.2.0"), os.path.join(self.package_folder, "lib"))
-            copy(self, "libmingwex.a", os.path.join(mingw, f"{self.settings.arch}-w64-mingw32", "lib"), os.path.join(self.package_folder, "lib"))
-            for lib in ["libgcc", "libgcc_s", "libmingwex"]:
-                if os.path.exists(os.path.join(self.package_folder, "lib", f"{lib}.a")):
-                    rename(self, os.path.join(self.package_folder, "lib", f"{lib}.a"),
-                           os.path.join(self.package_folder, "lib", f"{lib}.lib"))
-
     def package_info(self):
         self.cpp_info.libs = ["liquid"]
         if self.settings.os in ["Linux", "FreeBSD"]:
             self.cpp_info.system_libs.append("m")
-        if is_msvc(self):
-            if self.options.shared:
-                self.cpp_info.libs.append("libgcc_s")
-            else:
-                self.cpp_info.libs.append("libgcc")
-            self.cpp_info.libs.append("libmingwex")
