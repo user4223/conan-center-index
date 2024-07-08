@@ -4,7 +4,6 @@ from conan.tools.build import check_min_cppstd
 from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
 from conan.tools.env import VirtualBuildEnv
 from conan.tools.files import copy, get, rm, rmdir, download
-from conan.tools.microsoft import is_msvc
 from conan.tools.scm import Version
 import os
 
@@ -24,11 +23,13 @@ class IridescenceConan(ConanFile):
     options = {
         "shared": [True, False],
         "fPIC": [True, False],
+        "with_openmp": [True, False],
         "with_tbb": [True, False],
     }
     default_options = {
         "shared": False,
         "fPIC": True,
+        "with_openmp": True,
         "with_tbb": True,
     }
 
@@ -87,10 +88,8 @@ class IridescenceConan(ConanFile):
 
         tc = CMakeToolchain(self)
         tc.variables["BUILD_HELPER"] = True
-        tc.variables["BUILD_WITH_OPENMP"] = True
+        tc.variables["BUILD_WITH_OPENMP"] = self.options.with_openmp
         tc.variables["BUILD_WITH_TBB"] = self.options.with_tbb
-        if is_msvc(self):
-            tc.preprocessor_definitions["_USE_MATH_DEFINES"] = ""
         tc.generate()
 
         deps = CMakeDeps(self)
@@ -112,23 +111,6 @@ class IridescenceConan(ConanFile):
         rmdir(self, os.path.join(self.package_folder, "lib", "cmake"))
         rm(self, "*.pdb", os.path.join(self.package_folder, "lib"))
         rm(self, "*.pdb", os.path.join(self.package_folder, "bin"))
-
-    @property
-    def _openmp_flags(self):
-        # Based on https://github.com/Kitware/CMake/blob/v3.28.1/Modules/FindOpenMP.cmake#L104-L135
-        if self.settings.compiler == "clang":
-            return ["-fopenmp=libomp"]
-        elif self.settings.compiler == "apple-clang":
-            return ["-Xclang", "-fopenmp"]
-        elif self.settings.compiler == "gcc":
-            return ["-fopenmp"]
-        elif self.settings.compiler == "intel-cc":
-            return ["-Qopenmp"]
-        elif self.settings.compiler == "sun-cc":
-            return ["-xopenmp"]
-        if is_msvc(self):
-            return ["-openmp:llvm"]
-        return None
 
     def package_info(self):
         self.cpp_info.set_property("cmake_file_name", "small_gicp")
