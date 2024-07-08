@@ -145,6 +145,8 @@ class OsgearthConan(ConanFile):
         if self.options.with_webp:
             self.requires("libwebp/1.3.2")
 
+        self.requires("libpng/[>=1.6 <2]", override=True)
+
         # TODO:
         # - Unvendor imgui
         # - Unvendor portable-file-dialogs
