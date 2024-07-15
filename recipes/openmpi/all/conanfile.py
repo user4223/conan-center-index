@@ -171,8 +171,6 @@ class OpenMPIConan(ConanFile):
     def build(self):
         self._patch_sources()
         autotools = Autotools(self)
-        # Run autoreconf to fix "error: cannot run C compiled programs" configure issues with Clang
-        self.run("./autogen.pl --force", cwd=self.source_folder)
         autotools.configure()
         autotools.make()
 
