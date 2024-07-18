@@ -5,11 +5,8 @@ sources:
 patches:
   "cci.20240709":
     - patch_file: "patches/001-unvendor-deps.patch"
-      patch_description: "Use dependencies from Conan, enable static builds"
+      patch_description: "Use dependencies from Conan"
       patch_type: "conan"
     - patch_file: "patches/002-fix-guik-includes.patch"
       patch_description: "Fix a missing include in guik/screen_capture.cpp"
-      patch_type: "bugfix"
-    - patch_file: "patches/004-fix-windows-defines.patch"
-      patch_description: "Undef conflicting windows.h macros"
       patch_type: "bugfix"
