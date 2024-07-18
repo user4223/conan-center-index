@@ -30,7 +30,7 @@ class LibpointmatcherConan(ConanFile):
     default_options = {
         "shared": False,
         "fPIC": True,
-        "with_openmp": False,
+        "with_openmp": True,
     }
     short_paths = True
 

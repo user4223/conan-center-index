@@ -48,9 +48,8 @@ class MlpackConan(ConanFile):
         self.requires("cereal/1.3.2")
         self.requires("ensmallen/2.21.0")
         self.requires("stb/cci.20230920")
-        # TODO: MSVC OpenMP is not compatible, enable for MSVC after #22353
-        if not is_msvc(self):
-            self.requires("llvm-openmp/17.0.6")
+        # https://github.com/mlpack/mlpack/blob/4.4.0/src/mlpack/methods/det/dt_utils_impl.hpp#L184
+        self.requires("openmp/system", transitive_headers=True, transitive_libs=True)
 
     def package_id(self):
         self.info.clear()
