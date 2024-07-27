@@ -1,8 +1,6 @@
-<p align="center">
-    <img src="assets/JFrogConanCenter.png" width="600"/>
-</p>
+This is a fork of Conan Center Index containing [recipes and changes by @valgur](https://github.com/conan-io/conan-center-index/pulls?q=is%3Aopen+is%3Apr+author%3Avalgur+sort%3Aupdated-desc) not yet merged to the main Conan Center Index.
 
-Conan Center Index is the source index of recipes of the [ConanCenter](https://conan.io/center) package repository for [Conan](https://conan.io).
+## Setup
 
 This repository includes a Continuous Integration system that will build automatically the Conan packages for the recipes submitted via
 [Pull Request](https://github.com/conan-io/conan-center-index/pulls).
@@ -37,8 +35,7 @@ It is kept in this state to avoid breaking any existing Conan 1.x installations.
 
 ### How to consume recipes
 
-Starting to use recipes from this repository is as easy as running
-one simple command after installing Conan:
+## Added recipes and versions
 
 ```
 conan install --require=name/version [-g <generator>]
