@@ -28,7 +28,7 @@ class SplunkOpentelemetryConan(ConanFile):
     default_options = {
         "shared": False,
         "fPIC": True,
-        "build_jaeger_exporter": False,  # FIXME: causes version conflicts via thrift
+        "build_jaeger_exporter": True,
     }
 
     @property
