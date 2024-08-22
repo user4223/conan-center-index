@@ -151,7 +151,6 @@ class GobjectIntrospectionConan(ConanFile):
 
     def build(self):
         self._patch_sources()
-        os.environ["PKG_CONFIG_PATH"] = os.path.join(self.build_folder, "conan")
         meson = Meson(self)
         meson.configure()
         meson.build()
