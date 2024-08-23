@@ -52,18 +52,18 @@ endforeach()
 set(OpenMP_C_FLAGS "@OpenMP_FLAGS@")
 set(OpenMP_C_INCLUDE_DIR "${OpenMP_INCLUDE_DIR${_v1_suffix}}")
 set(OpenMP_C_INCLUDE_DIRS "${OpenMP_INCLUDE_DIRS${_v1_suffix}}")
-set(OpenMP_C_LIB_NAMES "@OpenMP_LIB_NAMES@")
-set(OpenMP_C_LIBRARIES "${OpenMP_LIBRARIES${_v1_suffix}}")
+set(OpenMP_C_LIB_NAMES OpenMP::OpenMP_C)
+set(OpenMP_C_LIBRARIES OpenMP::OpenMP_C)
 set(OpenMP_C_DEFINITIONS "${OpenMP_DEFINITIONS${_v1_suffix}}")
 
-set(OpenMP_CXX_FLAGS "${OpenMP_C_FLAGS}")
+set(OpenMP_CXX_FLAGS "--dont-use-OpenMP_CXX_FLAGS--use-OpenMP::OpenMP_CXX-target-instead")
 set(OpenMP_CXX_INCLUDE_DIR "${OpenMP_C_INCLUDE_DIR}")
 set(OpenMP_CXX_INCLUDE_DIRS "${OpenMP_C_INCLUDE_DIRS}")
-set(OpenMP_CXX_LIB_NAMES "${OpenMP_C_LIB_NAMES}")
-set(OpenMP_CXX_LIBRARIES "${OpenMP_C_LIBRARIES}")
+set(OpenMP_CXX_LIB_NAMES OpenMP::OpenMP_CXX)
+set(OpenMP_CXX_LIBRARIES OpenMP::OpenMP_CXX)
 set(OpenMP_CXX_DEFINITIONS "${OpenMP_C_DEFINITIONS}")
 
-set(OpenMP_omp_LIBRARY "${OpenMP_C_LIBRARIES}")
+set(OpenMP_omp_LIBRARY OpenMP::OpenMP)
 
 # Determine OpenMP specification date and version supported by the compiler.
 function(_openmp_get_compiler_spec_date)
@@ -194,6 +194,7 @@ find_package_handle_standard_args(OpenMP
     OpenMP_CXX_LIB_NAMES
     OpenMP_CXX_SPEC_DATE
     OpenMP_CXX_VERSION
+    OpenMP_omp_LIBRARY
   HANDLE_COMPONENTS
 )
 set(OPENMP_FOUND ${OpenMP_FOUND})
