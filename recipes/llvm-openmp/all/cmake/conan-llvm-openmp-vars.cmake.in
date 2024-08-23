@@ -52,7 +52,12 @@ foreach(_suffix RELEASE DEBUG RELWITHDEBINFO MINSIZEREL)
     endif()
 endforeach()
 
-set(OpenMP_C_FLAGS "@OpenMP_FLAGS@")
+# Due to a non-global library location, the library cannot be consumed via OpenMP_C_FLAGS/OpenMP_CXX_FLAGS alone.
+# The OpenMP::OpenMP_C and OpenMP::OpenMP_CXX targets must be used instead.
+# Setting the flags for internal use only.
+set(_OpenMP_FLAGS "@OpenMP_FLAGS@")
+
+set(OpenMP_C_FLAGS "--dont-use-OpenMP_C_FLAGS--use-OpenMP::OpenMP_C-target-instead")
 set(OpenMP_C_INCLUDE_DIR "${OpenMP_INCLUDE_DIR${_v1_suffix}}")
 set(OpenMP_C_INCLUDE_DIRS "${OpenMP_INCLUDE_DIRS${_v1_suffix}}")
 set(OpenMP_C_LIB_NAMES OpenMP::OpenMP_C)
