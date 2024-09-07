@@ -2,10 +2,11 @@ import os
 
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
+from conan.tools.apple import is_apple_os
 from conan.tools.build import check_min_cppstd
 from conan.tools.cmake import CMake, CMakeToolchain, CMakeDeps, cmake_layout
 from conan.tools.env import VirtualBuildEnv, VirtualRunEnv
-from conan.tools.files import get, copy, rm, export_conandata_patches, apply_conandata_patches
+from conan.tools.files import get, copy, rm, export_conandata_patches, apply_conandata_patches, save
 from conan.tools.microsoft import is_msvc_static_runtime
 from conan.tools.scm import Version
 
@@ -121,6 +122,7 @@ class MysqlConnectorCppConan(ConanFile):
         tc.cache_variables["CMAKE_TRY_COMPILE_CONFIGURATION"] = str(self.settings.build_type)
         tc.cache_variables["WITH_SSL"] = self.dependencies["openssl"].package_folder.replace("\\", "/")
         tc.cache_variables["CMAKE_PREFIX_PATH"] = self.generators_folder.replace("\\", "/")
+        tc.cache_variables["IS64BIT"] = True
         tc.generate()
 
         deps = CMakeDeps(self)
@@ -178,3 +180,9 @@ class MysqlConnectorCppConan(ConanFile):
 
         if not self.options.shared:
             self.cpp_info.defines = ["MYSQL_STATIC", "STATIC_CONCPP"]
+
+
+        if is_apple_os(self) or self.settings.os in ["Linux", "FreeBSD"]:
+            self.cpp_info.system_libs.extend(["resolv"])
+            if self.settings.os in ["Linux", "FreeBSD"]:
+                self.cpp_info.system_libs.extend(["m", "pthread"])
