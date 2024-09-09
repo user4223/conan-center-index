@@ -70,17 +70,8 @@ class ApriltagConan(ConanFile):
             deps = CMakeDeps(self)
             deps.generate()
 
-    def _patch_sources(self):
-        apply_conandata_patches(self)
-        # Fix DLL installation
-        if Version(self.version) <= "3.3.0":
-            replace_in_file(self, os.path.join(self.source_folder, "CMakeLists.txt"),
-                            "ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}",
-                            "ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}\n"
-                            "RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}")
-
     def build(self):
-        self._patch_sources()
+        apply_conandata_patches(self)
         cmake = CMake(self)
         cmake.configure()
         cmake.build()
