@@ -372,9 +372,9 @@ class ImageMagicConan(ConanFile):
         deps.generate()
 
     def _build_autotools(self):
-        with chdir(self, self.source_folder):
+        with chdir(self, os.path.join(self.source_folder, "ImageMagick")):
             autotools = Autotools(self)
-            autotools.configure()
+            autotools.configure(build_script_folder=os.path.join(self.source_folder, "ImageMagick"))
             autotools.make()
 
     def generate(self):
@@ -401,7 +401,7 @@ class ImageMagicConan(ConanFile):
             copy(self, "*.h", os.path.join(self.source_folder, "ImageMagick", "MagickWand"), os.path.join(include_dir, "MagickWand"))
             copy(self, "*.h", os.path.join(self.source_folder, "ImageMagick", "Magick++", "lib"), include_dir)
         else:
-            with chdir(self, self.source_folder):
+            with chdir(self, os.path.join(self.source_folder, "ImageMagick")):
                 autotools = Autotools(self)
                 autotools.install()
             rename(self,
