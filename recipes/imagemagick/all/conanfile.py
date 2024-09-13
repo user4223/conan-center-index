@@ -105,7 +105,7 @@ class ImageMagicConan(ConanFile):
         if self.options.with_openexr:
             self.requires("openexr/3.2.4")
         if self.options.with_heic:
-            self.requires("libheif/1.16.2")
+            self.requires("libheif/1.18.2")
         if self.options.with_jbig:
             self.requires("jbig/20160605")
         if self.options.with_jpeg == "libjpeg":
@@ -115,7 +115,7 @@ class ImageMagicConan(ConanFile):
         if self.options.with_openjp2:
             self.requires("openjpeg/2.5.2")
         if self.options.with_pango:
-            self.requires("pango/1.51.0")
+            self.requires("pango/1.54.0")
         if self.options.with_png:
             self.requires("libpng/[>=1.6 <2]")
         if self.options.with_tiff:
