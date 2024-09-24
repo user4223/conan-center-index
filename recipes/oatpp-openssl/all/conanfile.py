@@ -83,12 +83,12 @@ class OatppOpenSSLConan(ConanFile):
         ]
         self.cpp_info.components["_oatpp-openssl"].libdirs = [os.path.join("lib", f"oatpp-{self.version}")]
         if self.settings.os == "Windows" and self.options.shared:
-            self.cpp_info.bindirs = [os.path.join("bin", f"oatpp-{self.version}")]
+            self.cpp_info.components["_oatpp-openssl"].bindirs = [os.path.join("bin", f"oatpp-{self.version}")]
         else:
-            self.cpp_info.bindirs = []
-        self.cpp_info.libs = ["oatpp-openssl"]
+            self.cpp_info.components["_oatpp-openssl"].bindirs = []
+        self.cpp_info.components["_oatpp-openssl"].libs = ["oatpp-openssl"]
         if self.settings.os in ["Linux", "FreeBSD"]:
-            self.cpp_info.system_libs = ["pthread"]
+            self.cpp_info.components["_oatpp-openssl"].system_libs = ["pthread"]
 
         self.cpp_info.components["_oatpp-openssl"].set_property("cmake_target_name", "oatpp::oatpp-openssl")
         self.cpp_info.components["_oatpp-openssl"].requires = ["oatpp::oatpp", "openssl::openssl"]
