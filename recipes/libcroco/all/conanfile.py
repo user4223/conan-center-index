@@ -92,7 +92,8 @@ class LibcrocoConan(ConanFile):
         autotools.make()
 
     def package(self):
-        copy(self, "LICENSE", self.source_folder, os.path.join(self.package_folder, "licenses"))
+        copy(self, "COPYING", self.source_folder, os.path.join(self.package_folder, "licenses"))
+        copy(self, "COPYRIGHTS", self.source_folder, os.path.join(self.package_folder, "licenses"))
         autotools = Autotools(self)
         autotools.install()
         rm(self, "*.la", os.path.join(self.package_folder, "lib"))
