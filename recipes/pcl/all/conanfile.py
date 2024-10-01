@@ -592,6 +592,17 @@ class PclConan(ConanFile):
         if self.settings.os == "Windows":
             common.system_libs.append("ws2_32")
 
+        if self.options.with_openmp:
+            openmp_flags = []
+            if is_msvc(self):
+                openmp_flags = ["-openmp"]
+            elif self.settings.compiler == "gcc":
+                openmp_flags = ["-fopenmp"]
+            elif self.settings.compiler == "intel-cc":
+                openmp_flags = ["/Qopenmp"] if self.settings.os == "Windows" else ["-Qopenmp"]
+            self.cpp_info.cflags += openmp_flags
+            self.cpp_info.cxxflags += openmp_flags
+
         # TODO: Legacy, to be removed on Conan 2.0
         self.cpp_info.names["cmake_find_package"] = "PCL"
         self.cpp_info.names["cmake_find_package_multi"] = "PCL"
