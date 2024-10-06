@@ -87,4 +87,5 @@ class libxftConan(ConanFile):
 
     def package_info(self):
         self.cpp_info.set_property("pkg_config_name", "xft")
+        self.cpp_info.set_property("cmake_target_name", "X11::Xft")
         self.cpp_info.libs = ["Xft"]
