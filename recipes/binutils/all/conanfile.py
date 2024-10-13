@@ -34,6 +34,7 @@ class BinutilsConan(ConanFile):
         "target_os": [None, "ANY"],
         "target_triplet": [None, "ANY"],
         "prefix": [None, "ANY"],
+        "add_unprefixed_to_path": [True, False],
     }
 
     default_options = {
@@ -43,6 +44,7 @@ class BinutilsConan(ConanFile):
         "target_os": None,  # Initialized in configure, checked in validate
         "target_triplet": None,  # Initialized in configure, checked in validate
         "prefix": None,  # Initialized in configure (NOT config_options, because it depends on target_{arch,os})
+        "add_unprefixed_to_path": True,
     }
 
     def layout(self):
@@ -54,7 +56,7 @@ class BinutilsConan(ConanFile):
 
     @property
     def _settings_target(self):
-        return getattr(self, "settings_target", None) or self.settings
+        return self.settings_target or self.settings
 
     def export_sources(self):
         export_conandata_patches(self)
@@ -114,7 +116,7 @@ class BinutilsConan(ConanFile):
             raise ConanInvalidConfiguration(f"target_arch={target_archos.arch}/target_os={target_archos.os} is not compatible with {target_gnu_triplet.triplet}. Change target triplet to {suggested_gnu_triplet.triplet}, or change target_arch/target_os to {suggested_archos.arch}/{suggested_archos.os}.")
 
         # Check, when used as build requirement in a cross build, whether the target arch/os agree
-        settings_target = getattr(self, "settings_target", None)
+        settings_target = self.settings_target
         if settings_target is not None:
             if self.options.target_arch != settings_target.arch:
                 raise ConanInvalidConfiguration(f"binutils:target_arch={self.options.target_arch} does not match target architecture={settings_target.arch}")
@@ -123,6 +125,7 @@ class BinutilsConan(ConanFile):
 
     def package_id(self):
         del self.info.settings.compiler
+        del self.info.options.add_unprefixed_to_path
 
     def _raise_unsupported_configuration(self, key, value):
         raise ConanInvalidConfiguration(f"This configuration is unsupported by this conan recip. Please consider adding support. ({key}={value})")
@@ -183,20 +186,14 @@ class BinutilsConan(ConanFile):
         target_bindir = os.path.join(self._exec_prefix, str(self.options.target_triplet), "bin")
         self.cpp_info.bindirs = ["bin", target_bindir]
 
-        absolute_target_bindir = os.path.join(self.package_folder, target_bindir)
-
-        # v1 exports
         bindir = os.path.join(self.package_folder, "bin")
-        self.env_info.PATH.append(bindir)
-        self.env_info.PATH.append(absolute_target_bindir)
-        self.output.info(f"GNU triplet={self.options.target_triplet}")
-        self.user_info.gnu_triplet = self.options.target_triplet
-        self.user_info.prefix = self.options.prefix
-        self.output.info(f"executable prefix={self.options.prefix}")
-
-        # v2 exports
+        absolute_target_bindir = os.path.join(self.package_folder, target_bindir)
         self.buildenv_info.append_path("PATH", bindir)
-        self.buildenv_info.append_path("PATH", absolute_target_bindir)
+        if self.options.add_unprefixed_to_path:
+            self.buildenv_info.append_path("PATH", absolute_target_bindir)
+
+        self.conf_info.define("user.binutils:gnu_triplet", str(self.options.target_triplet))
+        self.conf_info.define("user.binutils:prefix", str(self.options.prefix))
 
         # Add recipe path to enable running the self test in the test package.
         # Don't use this property in production code. It's unsupported.
