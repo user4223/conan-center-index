@@ -1,0 +1,18 @@
+From 49908bd5dbb14140d909650a736514c5ad9c474b Mon Sep 17 00:00:00 2001
+From: Martin Valgur <martin.valgur@gmail.com>
+Date: Tue, 10 Dec 2024 16:49:06 +0200
+Subject: [PATCH] utils.hpp: add missing #include <cstdint>
+
+---
+ include/gzip/utils.hpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/gzip/utils.hpp b/include/gzip/utils.hpp
+index db123d1..f0514ff 100644
+--- a/include/gzip/utils.hpp
++++ b/include/gzip/utils.hpp
+@@ -1,3 +1,4 @@
++#include <cstdint>
+ #include <cstdlib>
+ 
+ namespace gzip {
