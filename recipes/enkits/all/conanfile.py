@@ -3,6 +3,7 @@ import os
 from conan import ConanFile
 from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout
 from conan.tools.files import copy, export_conandata_patches, get, replace_in_file
+from conan.tools.files.patches import apply_conandata_patches
 
 required_conan_version = ">=1.53.0"
 
@@ -42,6 +43,10 @@ class EnkiTSConan(ConanFile):
 
     def source(self):
         get(self, **self.conan_data["sources"][self.version], strip_root=True)
+        apply_conandata_patches(self)
+        replace_in_file(self, os.path.join(self.source_folder, "CMakeLists.txt"),
+                        'install(TARGETS enkiTS DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/enkiTS")',
+                        "install(TARGETS enkiTS ARCHIVE LIBRARY RUNTIME)")
 
     def generate(self):
         tc = CMakeToolchain(self)
@@ -50,16 +55,7 @@ class EnkiTSConan(ConanFile):
         tc.variables["ENKITS_BUILD_SHARED"] = self.options.shared
         tc.generate()
 
-    def _patch_sources(self):
-        replace_in_file(
-            self,
-            os.path.join(self.source_folder, "CMakeLists.txt"),
-            'install(TARGETS enkiTS DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/enkiTS")',
-            "install(TARGETS enkiTS ARCHIVE LIBRARY RUNTIME)",
-        )
-
     def build(self):
-        self._patch_sources()
         cmake = CMake(self)
         cmake.configure()
         cmake.build()

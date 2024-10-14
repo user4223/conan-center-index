@@ -8,3 +8,19 @@ sources:
   "1.8":
     url: "https://github.com/dougbinks/enkiTS/archive/v1.8.zip"
     sha256: "b96d8d439502d52f9dc419539b12b588df10750f4631ad5518586f7048cdfaef"
+patches:
+  "1.11":
+    - patch_file: "patches/1.10-add-missing-include.patch"
+      patch_description: "Add a missing #include <initializer_list>"
+      patch_type: "backport"
+      patch_source: "https://github.com/dougbinks/enkiTS/commit/2405c77dfe7be6d5b95ee7fda5b0ee7eff4cd7ed"
+  "1.10":
+    - patch_file: "patches/1.10-add-missing-include.patch"
+      patch_description: "Add a missing #include <initializer_list>"
+      patch_type: "backport"
+      patch_source: "https://github.com/dougbinks/enkiTS/commit/2405c77dfe7be6d5b95ee7fda5b0ee7eff4cd7ed"
+  "1.8":
+    - patch_file: "patches/1.8-add-missing-include.patch"
+      patch_description: "Add a missing #include <initializer_list>"
+      patch_type: "backport"
+      patch_source: "https://github.com/dougbinks/enkiTS/commit/2405c77dfe7be6d5b95ee7fda5b0ee7eff4cd7ed"
