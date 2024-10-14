@@ -1,0 +1,10 @@
+--- a/google/cloud/functions/internal/parse_options.cc
++++ b/google/cloud/functions/internal/parse_options.cc
+@@ -14,6 +14,7 @@
+ 
+ #include "google/cloud/functions/internal/parse_options.h"
+ #include <boost/program_options.hpp>
++#include <cstdint>
+ #include <iostream>
+ #include <limits>
+ #include <stdexcept>

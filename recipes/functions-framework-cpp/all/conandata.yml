@@ -13,6 +13,10 @@ patches:
     - patch_file: "patches/1.2.0-0002-find-nlohmann_json.patch"
       patch_description: "use cci's nlohmann_json"
       patch_type: "conan"
+    - patch_file: "patches/1.0.0-0003-add-missing-include.patch"
+      patch_description: "add a missing #include <cstdint>"
+      patch_type: "backport"
+      patch_source: "https://github.com/GoogleCloudPlatform/functions-framework-cpp/commit/951c0fb5da38688d5d3f51022056c87c668e3aa4"
   "1.0.0":
     - patch_file: "patches/1.0.0-0001-dont-skip-namelink.patch"
       patch_description: "disable NAMELINK_SKIP"
@@ -20,3 +24,7 @@ patches:
     - patch_file: "patches/1.0.0-0002-find-nlohmann_json.patch"
       patch_description: "use cci's nlohmann_json"
       patch_type: "conan"
+    - patch_file: "patches/1.0.0-0003-add-missing-include.patch"
+      patch_description: "add a missing #include <cstdint>"
+      patch_type: "backport"
+      patch_source: "https://github.com/GoogleCloudPlatform/functions-framework-cpp/commit/951c0fb5da38688d5d3f51022056c87c668e3aa4"
