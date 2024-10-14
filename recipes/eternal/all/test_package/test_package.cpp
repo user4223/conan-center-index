@@ -1,8 +1,8 @@
+#include <mapbox/eternal.hpp>
+
 #include <iostream>
 #include <cmath>
 #include <limits>
-
-#include "mapbox/eternal.hpp"
 
 struct Color {
     constexpr inline Color() {
