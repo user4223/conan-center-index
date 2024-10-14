@@ -1,0 +1,27 @@
+From c74f96602b942463e560d87c9dc6d7106450b2f5 Mon Sep 17 00:00:00 2001
+From: Enhex <enhex0@gmail.com>
+Date: Tue, 6 Jun 2023 16:22:04 +0300
+Subject: [PATCH] fix missing include
+
+---
+ include/deco/Deco.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/include/deco/Deco.h b/include/deco/Deco.h
+index 57d595d..05371b5 100644
+--- a/include/deco/Deco.h
++++ b/include/deco/Deco.h
+@@ -2,11 +2,12 @@
+ #define Deco_h
+ 
+ #include <array>
++#include <cstdint>
+ #include <limits>
++#include <stdexcept>
+ #include <string_view>
+ #include <strong_type.h>
+ #include <vector>
+-#include <stdexcept>
+ 
+ namespace deco
+ {

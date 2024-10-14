@@ -3,7 +3,8 @@ import os
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
 from conan.tools.build import check_min_cppstd
-from conan.tools.files import copy, get
+from conan.tools.files import copy, get, export_conandata_patches
+from conan.tools.files.patches import apply_conandata_patches
 from conan.tools.layout import basic_layout
 from conan.tools.scm import Version
 
@@ -35,6 +36,9 @@ class DecoConan(ConanFile):
             "clang": "5.0",
             "apple-clang": "9.1",
         }
+
+    def export_sources(self):
+        export_conandata_patches(self)
 
     def layout(self):
         basic_layout(self, src_folder="src")
@@ -68,6 +72,7 @@ class DecoConan(ConanFile):
 
     def source(self):
         get(self, **self.conan_data["sources"][self.version], strip_root=True)
+        apply_conandata_patches(self)
 
     def package(self):
         copy(self, "LICENSE.txt",
