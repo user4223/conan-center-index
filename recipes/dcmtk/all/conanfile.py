@@ -5,7 +5,7 @@ from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
 from conan.tools.build import cross_building, check_min_cppstd
 from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
-from conan.tools.files import apply_conandata_patches, copy, export_conandata_patches, get, replace_in_file, rename, rmdir, save
+from conan.tools.files import apply_conandata_patches, copy, export_conandata_patches, get, replace_in_file, rename, rmdir
 from conan.tools.microsoft import is_msvc, is_msvc_static_runtime
 from conan.tools.scm import Version
 
@@ -128,6 +128,7 @@ class DCMTKConan(ConanFile):
 
     def source(self):
         get(self, **self.conan_data["sources"][self.version], strip_root=True)
+        apply_conandata_patches(self)
 
     def generate(self):
         tc = CMakeToolchain(self)
@@ -188,7 +189,7 @@ class DCMTKConan(ConanFile):
                 arith_h = "arith_h_Macos_x86_64.h"
                 copy(self, arith_h, self.source_folder, dst_dir)
                 rename(self, os.path.join(dst_dir, arith_h), os.path.join(dst_dir, "arith.h"))
-           
+
         tc.generate()
 
         deps = CMakeDeps(self)
@@ -225,8 +226,6 @@ class DCMTKConan(ConanFile):
         }
 
     def _patch_sources(self):
-        apply_conandata_patches(self)
-
         # Workaround for CMakeDeps bug with check_* like functions.
         # See https://github.com/conan-io/conan/issues/12012 & https://github.com/conan-io/conan/issues/12180
         if self.options.with_openssl:
@@ -273,27 +272,6 @@ class DCMTKConan(ConanFile):
         rmdir(self, os.path.join(self.package_folder, "lib", "pkgconfig"))
         rmdir(self, os.path.join(self.package_folder, "etc"))
         rmdir(self, os.path.join(self.package_folder, "share"))
-
-        # TODO: to remove once support of cmake_find_package* dropped
-        self._create_cmake_module_alias_targets(
-            os.path.join(self.package_folder, self._module_file_rel_path),
-            {target: f"DCMTK::{target}" for target in self._dcmtk_components}
-        )
-
-    def _create_cmake_module_alias_targets(self, module_file, targets):
-        content = ""
-        for alias, aliased in targets.items():
-            content += textwrap.dedent(f"""\
-                if(TARGET {aliased} AND NOT TARGET {alias})
-                    add_library({alias} INTERFACE IMPORTED)
-                    set_property(TARGET {alias} PROPERTY INTERFACE_LINK_LIBRARIES {aliased})
-                endif()
-            """)
-        save(self, module_file, content)
-
-    @property
-    def _module_file_rel_path(self):
-        return os.path.join("lib", "cmake", f"conan-official-{self.name}-targets.cmake")
 
     @property
     def _dcmtk_components(self):
