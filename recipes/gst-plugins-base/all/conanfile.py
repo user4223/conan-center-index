@@ -98,11 +98,11 @@ class GStPluginsBaseConan(ConanFile):
         basic_layout(self, src_folder="src")
 
     def requirements(self):
-        self.requires("gstreamer/1.22.6", transitive_headers=True, transitive_libs=True)
+        self.requires("gstreamer/1.24.7", transitive_headers=True, transitive_libs=True)
         self.requires("glib/2.78.3", transitive_headers=True, transitive_libs=True)
         self.requires("zlib/[>=1.2.11 <2]")
         if self.options.get_safe("with_libalsa"):
-            self.requires("libalsa/1.2.12")
+            self.requires("libalsa/1.2.10")
         if self.options.get_safe("with_xorg"):
             self.requires("xorg/system", transitive_headers=True, transitive_libs=True)
         if self.options.with_gl:
@@ -131,7 +131,7 @@ class GStPluginsBaseConan(ConanFile):
         if self.options.with_vorbis:
             self.requires("vorbis/1.3.7")
         if self.options.with_pango:
-            self.requires("pango/1.51.0")
+            self.requires("pango/1.54.0")
 
     def validate(self):
         if not self.dependencies["glib"].options.shared and self.options.shared:
@@ -156,10 +156,10 @@ class GStPluginsBaseConan(ConanFile):
             self.tool_requires("flex/2.6.4")
         if self.options.get_safe("with_wayland"):
             if not self._is_legacy_one_profile:
-                self.tool_requires("wayland/<host_version>")
-            self.tool_requires("wayland-protocols/1.33")
+                self.tool_requires("wayland/1.22.0")
+            self.tool_requires("wayland-protocols/1.36")
         if self.options.with_introspection:
-            self.tool_requires("gobject-introspection/1.72.0")
+            self.tool_requires("gobject-introspection/1.78.1")
 
     def source(self):
         get(self, **self.conan_data["sources"][self.version], strip_root=True)
