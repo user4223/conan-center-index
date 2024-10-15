@@ -1,0 +1,24 @@
+diff --git a/include/libjungle/sized_buf.h b/include/libjungle/sized_buf.h
+index 6d15558..d849ba4 100644
+--- a/include/libjungle/sized_buf.h
++++ b/include/libjungle/sized_buf.h
+@@ -16,6 +16,7 @@ limitations under the License.
+ 
+ #pragma once
+ 
++#include <cstdint>
+ #include <iostream>
+ #include <sstream>
+ #include <string>
+diff --git a/src/generic_bitmap.h b/src/generic_bitmap.h
+index 0b277bf..4a0fbfa 100644
+--- a/src/generic_bitmap.h
++++ b/src/generic_bitmap.h
+@@ -20,6 +20,7 @@ limitations under the License.
+ 
+ #pragma once
+ 
++#include <cstdlib>
+ #include <mutex>
+ #include <thread>
+ 
