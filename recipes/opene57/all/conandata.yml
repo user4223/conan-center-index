@@ -1,4 +1,7 @@
 sources:
+  "1.7.0":
+    url: "https://github.com/openE57/openE57/archive/1.7.0.tar.gz"
+    sha256: "f76d08a2732f0ee7ea9066ef5ca915fce2b977b486cc817c3aa6ef4048611d9b"
   "1.6.5":
     url: "https://github.com/openE57/openE57/archive/1.6.5.tar.gz"
     sha256: "23f3c159550a70b6a1c2330f0f03ed816cbc27ff5656410bfee527bae31eb186"
