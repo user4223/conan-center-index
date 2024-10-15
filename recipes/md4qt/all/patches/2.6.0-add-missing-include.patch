@@ -1,0 +1,10 @@
+--- a/md4qt/traits.hpp
++++ b/md4qt/traits.hpp
+@@ -41,6 +41,7 @@
+ #include <cctype>
+ #include <string>
+ #include <algorithm>
++#include <utility>
+ 
+ // ICU include.
+ #include <unicode/unistr.h>

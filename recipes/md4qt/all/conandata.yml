@@ -11,3 +11,24 @@ sources:
   "2.6.0":
     url: "https://github.com/igormironchik/md4qt/archive/refs/tags/2.6.0.tar.gz"
     sha256: "8884a3b18fd923dd49994190e0b11c1882e409fce59fb6e5ee8e866dd889b8d0"
+patches:
+  "3.0.0":
+    - patch_file: "patches/2.8.2-add-missing-include.patch"
+      patch_description: "Add a missing #include <utility>"
+      patch_type: "backport"
+      patch_source: "https://invent.kde.org/libraries/md4qt/-/commit/5b2068486cbf0421d9ea47cb51e8c510a5f519c0"
+  "2.8.2":
+    - patch_file: "patches/2.8.2-add-missing-include.patch"
+      patch_description: "Add a missing #include <utility>"
+      patch_type: "backport"
+      patch_source: "https://invent.kde.org/libraries/md4qt/-/commit/5b2068486cbf0421d9ea47cb51e8c510a5f519c0"
+  "2.7.4":
+    - patch_file: "patches/2.6.0-add-missing-include.patch"
+      patch_description: "Add a missing #include <utility>"
+      patch_type: "backport"
+      patch_source: "https://invent.kde.org/libraries/md4qt/-/commit/5b2068486cbf0421d9ea47cb51e8c510a5f519c0"
+  "2.6.0":
+    - patch_file: "patches/2.6.0-add-missing-include.patch"
+      patch_description: "Add a missing #include <utility>"
+      patch_type: "backport"
+      patch_source: "https://invent.kde.org/libraries/md4qt/-/commit/5b2068486cbf0421d9ea47cb51e8c510a5f519c0"

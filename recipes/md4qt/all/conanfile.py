@@ -1,7 +1,7 @@
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
 from conan.tools.build import check_min_cppstd
-from conan.tools.files import copy, get
+from conan.tools.files import copy, get, export_conandata_patches, apply_conandata_patches
 from conan.tools.layout import basic_layout
 from conan.tools.scm import Version
 import os
@@ -12,7 +12,7 @@ required_conan_version = ">=1.50.0"
 class Md4QtConan(ConanFile):
     name = "md4qt"
     url = "https://github.com/conan-io/conan-center-index"
-    homepage = "https://github.com/igormironchik/md4qt"
+    homepage = "https://invent.kde.org/libraries/md4qt"
     license = "MIT"
     description = "Header-only C++ library for parsing Markdown."
     topics = ("markdown", "gfm", "parser", "icu", "ast", "commonmark", "md", "qt6", "stl", "cpp17")
@@ -33,6 +33,9 @@ class Md4QtConan(ConanFile):
             "clang": "12",
             "apple-clang": "14",
         }
+
+    def export_sources(self):
+        export_conandata_patches(self)
 
     def layout(self):
         basic_layout(self, src_folder="src")
@@ -55,6 +58,7 @@ class Md4QtConan(ConanFile):
 
     def source(self):
         get(self, **self.conan_data["sources"][self.version], strip_root=True)
+        apply_conandata_patches(self)
 
     def build(self):
         pass
