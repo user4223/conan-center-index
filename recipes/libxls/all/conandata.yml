@@ -6,4 +6,9 @@ patches:
   "1.6.2":
     - patch_file: "patches/1.6.2-0001-fix-ssize_t-msvc.patch"
       patch_description: "Solve ssize_t when building on Windows"
-      patch_type: "conan"
+      patch_type: "portability"
+      patch_source: "https://github.com/libxls/libxls/pull/103"
+    - patch_file: "patches/1.6.2-0002-fix-cpp-includes-in-extern-c.patch"
+      patch_description: "Fix C++ headers being included inside an extern C block"
+      patch_type: "portability"
+      patch_source: "https://github.com/libxls/libxls/pull/136"

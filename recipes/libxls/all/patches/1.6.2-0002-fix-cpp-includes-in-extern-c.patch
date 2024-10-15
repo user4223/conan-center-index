@@ -1,0 +1,45 @@
+From 5e6db8e0943a7202a16cc07bdd0d9f404ce6c43f Mon Sep 17 00:00:00 2001
+From: Martin Valgur <martin.valgur@gmail.com>
+Date: Tue, 10 Dec 2024 20:06:31 +0200
+Subject: [PATCH] Don't include C++ headers inside extern "C" {}
+
+---
+ include/libxls/ole.h      | 4 ----
+ include/libxls/xlstypes.h | 4 ----
+ 2 files changed, 8 deletions(-)
+
+diff --git a/include/libxls/ole.h b/include/libxls/ole.h
+index 09e802e..bc25f5d 100644
+--- a/include/libxls/ole.h
++++ b/include/libxls/ole.h
+@@ -36,11 +36,7 @@
+ #ifndef OLE_INCLUDE
+ #define OLE_INCLUDE
+ 
+-#ifdef __cplusplus
+-#include <cstdio>			// FILE *
+-#else
+ #include <stdio.h>			// FILE *
+-#endif
+ 
+ #include "../libxls/xlstypes.h"
+ 
+diff --git a/include/libxls/xlstypes.h b/include/libxls/xlstypes.h
+index 52da772..84bd7cd 100644
+--- a/include/libxls/xlstypes.h
++++ b/include/libxls/xlstypes.h
+@@ -36,11 +36,7 @@
+ #ifndef XLS_TYPES_INC
+ #define XLS_TYPES_INC
+ 
+-#ifdef __cplusplus
+-#include <cstdint>
+-#else
+ #include <stdint.h>
+-#endif
+ #include <sys/types.h>
+ 
+ typedef unsigned char		BYTE;
+-- 
+2.25.1
+
