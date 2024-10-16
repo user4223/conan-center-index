@@ -1,0 +1,10 @@
+--- a/core/fxcodec/fx_codec.cpp
++++ b/core/fxcodec/fx_codec.cpp
+@@ -7,6 +7,7 @@
+ #include "core/fxcodec/fx_codec.h"
+ 
+ #include <algorithm>
++#include <cstdint>
+ #include <utility>
+ 
+ #include "core/fxcrt/fx_memory.h"

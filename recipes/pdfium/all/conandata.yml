@@ -13,3 +13,8 @@ sources:
     chromium_build:
       url: "https://chromium.googlesource.com/chromium/src/build/+archive/95667421554b672f9330df8efb8148b6c2d00594.tar.gz"
       # sha256 is volatile on googlesource, no up-to-date github fork
+patches:
+  "95.0.4629":
+    - patch_file: "patches/add-missing-includes.patch"
+      patch_description: "Add a missing #include <cstdint>"
+      patch_type: "bugfix"

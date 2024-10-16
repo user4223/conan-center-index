@@ -5,7 +5,7 @@ from conan.errors import ConanInvalidConfiguration
 from conan.tools.apple import is_apple_os
 from conan.tools.build import check_min_cppstd, stdcpp_library
 from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
-from conan.tools.files import copy, get
+from conan.tools.files import copy, get, export_conandata_patches, apply_conandata_patches
 from conan.tools.gnu import PkgConfigDeps
 from conan.tools.scm import Version
 
@@ -32,6 +32,9 @@ class PdfiumConan(ConanFile):
         "fPIC": True,
         "with_libjpeg": "libjpeg",
     }
+
+    def export_sources(self):
+        export_conandata_patches(self)
 
     def config_options(self):
         if self.settings.os == "Windows":
@@ -82,6 +85,7 @@ class PdfiumConan(ConanFile):
             destination=os.path.join(self.source_folder, "base", "trace_event", "common"))
         get(self, **self.conan_data["sources"][self.version]["chromium_build"],
             destination=os.path.join(self.source_folder, "build"))
+        apply_conandata_patches(self)
 
     def generate(self):
         tc = CMakeToolchain(self)
