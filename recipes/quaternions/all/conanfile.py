@@ -2,7 +2,7 @@ import os
 
 from conan import ConanFile
 from conan.tools.build import check_min_cppstd
-from conan.tools.files import copy, get, replace_in_file
+from conan.tools.files import copy, get, export_conandata_patches, apply_conandata_patches
 from conan.tools.layout import basic_layout
 
 required_conan_version = ">=1.52.0"
@@ -24,6 +24,9 @@ class QuaternionsConan(ConanFile):
     def _min_cppstd(self):
         return 11
 
+    def export_sources(self):
+        export_conandata_patches(self)
+
     def layout(self):
         basic_layout(self, src_folder="src")
 
@@ -36,10 +39,7 @@ class QuaternionsConan(ConanFile):
 
     def source(self):
         get(self, **self.conan_data["sources"][self.version], strip_root=True)
-        replace_in_file(self,
-                        os.path.join(self.source_folder, "include", "quaternion.h"),
-                        "#include <boost/mpl/bool.hpp>",
-                        "")
+        apply_conandata_patches(self)
 
     def package(self):
         copy(self, "LICENSE",
