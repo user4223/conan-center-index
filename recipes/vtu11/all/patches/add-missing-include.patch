@@ -1,0 +1,10 @@
+--- a/vtu11/inc/alias.hpp
++++ b/vtu11/inc/alias.hpp
+@@ -10,6 +10,7 @@
+ #ifndef VTU11_ALIAS_HPP
+ #define VTU11_ALIAS_HPP
+ 
++#include <cstdint>
+ #include <string>
+ #include <map>
+ #include <utility>
