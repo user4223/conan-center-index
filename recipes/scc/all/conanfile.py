@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
@@ -79,6 +80,11 @@ class SystemcComponentsConan(ConanFile):
             raise ConanInvalidConfiguration(f"{self.ref} recipe is not supported on MSVC. Contributions are welcome!")
         if self.settings.compiler.get_safe("cppstd"):
             check_min_cppstd(self, 11)
+            # C++20 fails with
+            # third_party/scv-tr/src/scv-tr/_scv_introspection.h:1613:39: error: expected unqualified-id before ‘)’ token
+            # and
+            # third_party/lwtr4sc/src/lwtr/lwtr_text.cpp:138:34: error: ‘format’ is not a constant expression
+            check_min_cppstd(self, 17)
         if self.settings.compiler == "gcc" and Version(self.settings.compiler.version) < "7":
             raise ConanInvalidConfiguration("GCC < version 7 is not supported")
 
