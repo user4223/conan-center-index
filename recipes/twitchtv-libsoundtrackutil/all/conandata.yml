@@ -4,5 +4,8 @@ sources:
     sha256: "95546c40850ee02c03424ca189d66cb4359117b47c87ccc18c5ebe348fd4e040"
 patches:
   "0.0.8":
-    - patch_file: "patches/clang-8-fix.patch"
     - patch_file: "patches/cmake-fixes.patch"
+    - patch_file: "patches/add-missing-includes.patch"
+      patch_description: "Add missing includes"
+      patch_type: "bugfix"
+      patch_source: "https://github.com/twitchtv/libsoundtrackutil/pull/5"

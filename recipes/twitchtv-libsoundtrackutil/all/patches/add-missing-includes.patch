@@ -1,0 +1,11 @@
+--- a/libsoundtrackutil/include/libsoundtrackutil/ByteStream.h
++++ b/libsoundtrackutil/include/libsoundtrackutil/ByteStream.h
+@@ -4,6 +4,8 @@
+ 
+ #pragma once
+ 
++#include <cstdint>
++#include <cstring>
+ #include <gsl/span>
+ #include <vector>
+ 
