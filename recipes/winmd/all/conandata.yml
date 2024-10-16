@@ -2,3 +2,9 @@ sources:
   "1.0.210629.2":
     url: "https://github.com/microsoft/winmd/archive/refs/tags/1.0.210629.2.tar.gz"
     sha256: "93ef28b801abc390a2a09a69d56e1200533a5c8d9fc1743cb23afaaa890ac5a8"
+patches:
+  "1.0.210629.2":
+    - patch_file: "patches/add-missing-include.patch"
+      patch_description: "Add a missing include"
+      patch_type: "bugfix"
+      patch_source: "https://github.com/microsoft/winmd/pull/35"
