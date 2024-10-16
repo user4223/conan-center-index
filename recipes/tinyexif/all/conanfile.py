@@ -1,5 +1,5 @@
 from conan import ConanFile
-from conan.tools.files import get, rmdir, save, load
+from conan.tools.files import get, rmdir, save, load, export_conandata_patches, apply_conandata_patches
 from conan.tools.build import check_min_cppstd
 from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
 from conan.tools.microsoft import is_msvc_static_runtime
@@ -29,6 +29,9 @@ class TinyEXIFConan(ConanFile):
     def _min_cppstd(self):
         return 11
 
+    def export_sources(self):
+        export_conandata_patches(self)
+
     def config_options(self):
         if self.settings.os == "Windows":
             del self.options.fPIC
@@ -49,6 +52,7 @@ class TinyEXIFConan(ConanFile):
 
     def source(self):
         get(self, **self.conan_data["sources"][self.version], strip_root=True)
+        apply_conandata_patches(self)
 
     def generate(self):
         tc = CMakeToolchain(self)
