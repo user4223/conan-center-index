@@ -5,7 +5,6 @@ from conan.errors import ConanInvalidConfiguration
 from conan.tools.apple import is_apple_os
 from conan.tools.build import check_min_cppstd
 from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
-from conan.tools.env import VirtualBuildEnv
 from conan.tools.files import copy, get, rm, rmdir
 from conan.tools.scm import Version
 
@@ -48,6 +47,7 @@ class SentryNativeConan(ConanFile):
         "with_breakpad": "sentry",
         "wer": False,
     }
+    implements = ["auto_shared_fpic"]
 
     @property
     def _min_cppstd(self):
@@ -56,33 +56,7 @@ class SentryNativeConan(ConanFile):
         else:
             return "17"
 
-    @property
-    def _minimum_compilers_version(self):
-        if Version(self.version) >= "0.7.8" and self.options.get_safe("with_crashpad") == "sentry":
-            # Sentry-native 0.7.8 requires C++20: Concepts and bit_cast
-            # https://github.com/chromium/mini_chromium/blob/e49947ad445c4ed4bc1bb4ed60bbe0fe17efe6ec/base/numerics/byte_conversions.h#L88
-            return {
-                "Visual Studio": "16",
-                "msvc": "192",
-                "gcc": "11",
-                "clang": "14",
-                "apple-clang": "14",
-            }
-        minimum_gcc_version = "5"
-        if self.options.get_safe("backend") == "breakpad" or self.options.get_safe("backend") == "crashpad":
-            minimum_gcc_version = "7"
-        return {
-            "Visual Studio": "15",
-            "msvc": "191",
-            "gcc": minimum_gcc_version,
-            "clang": "3.4",
-            "apple-clang": "5.1",
-        }
-
     def config_options(self):
-        if self.settings.os == "Windows":
-            del self.options.fPIC
-
         if self.settings.os != "Windows" or Version(self.version) < "0.6.0":
             del self.options.wer
 
@@ -103,8 +77,6 @@ class SentryNativeConan(ConanFile):
             del self.options.crashpad_with_tls
 
     def configure(self):
-        if self.options.shared:
-            self.options.rm_safe("fPIC")
         if self.options.backend != "crashpad":
             self.options.rm_safe("with_crashpad")
         if self.options.backend != "breakpad":
@@ -127,8 +99,9 @@ class SentryNativeConan(ConanFile):
             if self.options.with_breakpad == "google":
                 self.requires("breakpad/cci.20210521")
         if self.options.get_safe("qt"):
-            self.requires("qt/[~5.15]")
-            self.requires("openssl/[>=1.1 <4]")
+            self.requires("qt/[>=5.15 <7]")
+            if not (self.options.backend == "crashpad" and self.options.get_safe("crashpad_with_tls")):
+                self.requires("openssl/[>=1.1 <4]")
 
     def validate(self):
         check_min_cppstd(self, self._min_cppstd)
@@ -151,7 +124,6 @@ class SentryNativeConan(ConanFile):
         get(self, **self.conan_data["sources"][self.version])
 
     def generate(self):
-        VirtualBuildEnv(self).generate()
         tc = CMakeToolchain(self)
         tc.variables["SENTRY_BACKEND"] = self.options.backend
         # See https://github.com/getsentry/sentry-native/pull/928
@@ -176,11 +148,11 @@ class SentryNativeConan(ConanFile):
         cmake.build()
 
     def package(self):
-        copy(self, "LICENSE", src=self.source_folder, dst=os.path.join(self.package_folder, "licenses"))
+        copy(self, "LICENSE", self.source_folder, os.path.join(self.package_folder, "licenses"))
         cmake = CMake(self)
         cmake.install()
         rmdir(self, os.path.join(self.package_folder, "lib", "cmake"))
-        rm(self, "*pdb", os.path.join(self.package_folder, "bin"))
+        rm(self, "*.pdb", os.path.join(self.package_folder, "bin"))
 
     def package_info(self):
         self.cpp_info.set_property("cmake_file_name", "sentry")
