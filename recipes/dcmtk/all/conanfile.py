@@ -3,7 +3,7 @@ import textwrap
 
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
-from conan.tools.build import cross_building, check_min_cppstd
+from conan.tools.build import cross_building, check_min_cppstd, can_run
 from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
 from conan.tools.files import apply_conandata_patches, copy, export_conandata_patches, get, replace_in_file, rename, rmdir
 from conan.tools.microsoft import is_msvc, is_msvc_static_runtime
@@ -119,9 +119,10 @@ class DCMTKConan(ConanFile):
         if cross_building(self):
             if self.settings.os == "Macos" and self.settings.arch != "x86_64":
                 raise ConanInvalidConfiguration("MacOS crossbuilding is only supported to target x86_64")
-            else:
-                # Note: other cross-building scenarios have not been tested and may also need to be marked as invalid
-                self.output.warning("Crossbuilding has not been tested and may not work. Please report to Conan Center Index if you find any issues.")
+            elif not can_run(self):
+                # Need to supply an architecture-specific arith.h header to cross-compile.
+                # TODO: add support when https://github.com/DCMTK/dcmtk/commit/eeb7f7e4b913ccf661481da2099736c358c581b9 is released
+                raise ConanInvalidConfiguration("Cross building is not supported")
 
     def validate(self):
         check_min_cppstd(self, 11)
