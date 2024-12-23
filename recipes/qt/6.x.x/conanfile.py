@@ -6,7 +6,7 @@ import textwrap
 
 from conan import ConanFile, conan_version
 from conan.tools.apple import is_apple_os
-from conan.tools.build import cross_building, check_min_cppstd, default_cppstd
+from conan.tools.build import cross_building, check_min_cppstd
 from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
 from conan.tools.env import VirtualBuildEnv, VirtualRunEnv, Environment
 from conan.tools.files import copy, get, replace_in_file, apply_conandata_patches, save, rm, rmdir, export_conandata_patches
@@ -15,7 +15,7 @@ from conan.tools.microsoft import msvc_runtime_flag, is_msvc
 from conan.tools.scm import Version
 from conan.errors import ConanException, ConanInvalidConfiguration
 
-required_conan_version = ">=1.55.0"
+required_conan_version = ">=2.0"
 
 
 class QtConan(ConanFile):
@@ -654,23 +654,25 @@ class QtConan(ConanFile):
 
         if self.settings.os == "Windows":
             tc.variables["HOST_PERL"] = self.dependencies.build["strawberryperl"].conf_info.get("user.strawberryperl:perl", check_type=str)
-                               #"set(QT_EXTRA_INCLUDEPATHS ${CONAN_INCLUDE_DIRS})\n"
-                               #"set(QT_EXTRA_DEFINES ${CONAN_DEFINES})\n"
-                               #"set(QT_EXTRA_LIBDIRS ${CONAN_LIB_DIRS})\n"
 
-        current_cpp_std = self.settings.get_safe("compiler.cppstd", default_cppstd(self))
-        current_cpp_std = str(current_cpp_std).replace("gnu", "")
+        # https://github.com/qt/qtbase/blob/v6.8.1/configure.cmake#L252-L289
+        current_cpp_std = int(str(self.settings.compiler.cppstd).replace("gnu", ""))
         cpp_std_map = {
             11: "FEATURE_cxx11",
             14: "FEATURE_cxx14",
             17: "FEATURE_cxx17",
-            20: "FEATURE_cxx20"
+            20: "FEATURE_cxx20",
+            23: "FEATURE_cxx2b",
         }
-        if Version(self.version) >= "6.5.0":
-            cpp_std_map[23] = "FEATURE_cxx2b"
-
         for std, feature in cpp_std_map.items():
-            tc.variables[feature] = "ON" if int(current_cpp_std) >= std else "OFF"
+            tc.variables[feature] = current_cpp_std >= std
+
+        # The mandatory INT128 support requires GNU extensions when using libstdc++.
+        # https://github.com/qt/qtbase/commit/7805b3c32f88a5405a4a12b402c93cf6cb5dedc4
+        # https://github.com/qt/qtbase/blob/v6.8.0/src/corelib/global/qtypes.cpp#L506-L511
+        if Version(self.version) >= "6.8.0":
+            if str(self.settings.compiler.libcxx) in ["libstdc++", "libstdc++11"]:
+                tc.variables["CMAKE_CXX_EXTENSIONS"] = True
 
         tc.variables["QT_USE_VCPKG"] = False
         tc.cache_variables["QT_USE_VCPKG"] = False
@@ -690,6 +692,10 @@ class QtConan(ConanFile):
                 self.info.settings.compiler.runtime_type = "Release/Debug"
         if self.info.settings.os == "Android":
             del self.info.options.android_sdk
+        if Version(self.version) >= "6.8.0":
+            if str(self.info.settings.compiler.libcxx) in ["libstdc++", "libstdc++11"]:
+                if "gnu" not in str(self.info.settings.compiler.cppstd):
+                    self.info.settings.compiler.cppstd = f"gnu{self.info.settings.compiler.cppstd}"
 
     def source(self):
         destination = self.source_folder
@@ -712,14 +718,12 @@ class QtConan(ConanFile):
             if os.path.isfile(file):
                 os.remove(file)
 
-        # workaround QTBUG-94356
-        replace_in_file(self, os.path.join(self.source_folder, "qtbase", "cmake", "FindWrapSystemZLIB.cmake"), '"-lz"', 'ZLIB::ZLIB')
-        replace_in_file(self, os.path.join(self.source_folder, "qtbase", "configure.cmake"),
-            "set_property(TARGET ZLIB::ZLIB PROPERTY IMPORTED_GLOBAL TRUE)",
-            "")
-        if Version(self.version) <= "6.4.0":
-            # use official variable name https://cmake.org/cmake/help/latest/module/FindFontconfig.html
-            replace_in_file(self, os.path.join(self.source_folder, "qtbase", "src", "gui", "configure.cmake"), "FONTCONFIG_FOUND", "Fontconfig_FOUND")
+        # workaround https://bugreports.qt.io/browse/QTBUG-94356
+        if Version(self.version) < "6.8.0":
+            replace_in_file(self, os.path.join(self.source_folder, "qtbase", "cmake", "FindWrapSystemZLIB.cmake"), '"-lz"', "ZLIB::ZLIB")
+            replace_in_file(self, os.path.join(self.source_folder, "qtbase", "configure.cmake"),
+                "set_property(TARGET ZLIB::ZLIB PROPERTY IMPORTED_GLOBAL TRUE)",
+                "")
 
         replace_in_file(self,
                         os.path.join(self.source_folder, "qtbase", "cmake", "QtAutoDetect.cmake" if Version(self.version) < "6.6.2" else "QtAutoDetectHelpers.cmake"),
@@ -909,6 +913,8 @@ class QtConan(ConanFile):
         if self.options.qtdeclarative:
             targets.extend(["qmltyperegistrar", "qmlcachegen", "qmllint", "qmlimportscanner"])
             targets.extend(["qmlformat", "qml", "qmlprofiler", "qmlpreview"])
+            if Version(self.version) >= "6.8.0":
+                targets.append("qmlaotstats")
             # Note: consider "qmltestrunner", see https://github.com/conan-io/conan-center-index/issues/24276
         if self.options.get_safe("qtremoteobjects"):
             targets.append("repc")
